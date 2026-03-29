@@ -76,8 +76,8 @@ const I18N = {
   'zh-TW': {
     title:         '貪食蛇對戰',
     btnPvp:        '1P vs 2P',
-    btnPvc:        '1P vs 電腦',
-    btnCvc:        '電腦 vs 電腦',
+    btnPvc:        '1P vs AI',
+    btnCvc:        'AI vs AI',
     speedLabel:    '速度：',
     speedSlow:     '慢速',
     speedNormal:   '正常',
@@ -96,7 +96,7 @@ const I18N = {
     pauseSubTouch: '再按 ⏸ 繼續',
     pauseSubKey:   '按 P 繼續',
     respawning:    '重生中...',
-    p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
+    p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
     rotateHint: '請旋轉手機為直向',
     hintPvpTouch:
       `<span class="c-p1">● 玩家1：上方觸控板滑動</span><br>
@@ -108,15 +108,15 @@ const I18N = {
        撞牆、撞自己或對方蛇身 → 扣分並重生<br>搶先吃到食物 → 得分`,
     hintPvcTouch:
       `<span class="c-p1">● 玩家1：在畫面任意滑動操控</span><br>
-       <span class="c-p2">● 電腦：自動追蹤食物</span><br><br>
+       <span class="c-p2">● AI：自動追蹤食物</span><br><br>
        撞牆或對方 → 扣分並重生　搶食物 → 得分`,
     hintPvcKey:
       `<span class="c-p1">● 玩家1：WASD 或方向鍵</span><br>
-       <span class="c-p2">● 電腦：自動追蹤食物</span><br><br>
+       <span class="c-p2">● AI：自動追蹤食物</span><br><br>
        撞牆、撞自己或對方蛇身 → 扣分並重生<br>搶先吃到食物 → 得分`,
     hintCvc:
-      `<span class="c-p1">● CPU1：自動追蹤食物</span><br>
-       <span class="c-p2">● CPU2：自動追蹤食物</span><br><br>
+      `<span class="c-p1">● AI 1：自動追蹤食物</span><br>
+       <span class="c-p2">● AI 2：自動追蹤食物</span><br><br>
        <span class="c-accent">🤖 純觀戰模式，完全不需動手！</span><br>
        撞牆、撞自己或對方蛇身 → 扣分並重生`,
   },
@@ -124,8 +124,8 @@ const I18N = {
   'en': {
     title:         'Snake Battle',
     btnPvp:        '1P vs 2P',
-    btnPvc:        '1P vs CPU',
-    btnCvc:        'CPU vs CPU',
+    btnPvc:        '1P vs AI',
+    btnCvc:        'AI vs AI',
     speedLabel:    'Speed:',
     speedSlow:     'Slow',
     speedNormal:   'Normal',
@@ -144,7 +144,7 @@ const I18N = {
     pauseSubTouch: 'Tap ⏸ to resume',
     pauseSubKey:   'P to resume',
     respawning:    'Respawning...',
-    p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
+    p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
     rotateHint: 'Please rotate to portrait',
     hintPvpTouch:
       `<span class="c-p1">● P1: Swipe on top pad</span><br>
@@ -156,15 +156,15 @@ const I18N = {
        Hit wall, self, or opponent → lose point<br>Eat food first → gain point`,
     hintPvcTouch:
       `<span class="c-p1">● P1: Swipe anywhere on screen</span><br>
-       <span class="c-p2">● CPU: Auto-chases food</span><br><br>
+       <span class="c-p2">● AI: Auto-chases food</span><br><br>
        Hit wall or opponent → lose point &amp; respawn`,
     hintPvcKey:
       `<span class="c-p1">● P1: WASD or Arrow keys</span><br>
-       <span class="c-p2">● CPU: Auto-chases food</span><br><br>
+       <span class="c-p2">● AI: Auto-chases food</span><br><br>
        Hit wall, self, or opponent → lose point`,
     hintCvc:
-      `<span class="c-p1">● CPU1: Auto-chases food</span><br>
-       <span class="c-p2">● CPU2: Auto-chases food</span><br><br>
+      `<span class="c-p1">● AI 1: Auto-chases food</span><br>
+       <span class="c-p2">● AI 2: Auto-chases food</span><br><br>
        <span class="c-accent">🤖 Spectator mode — sit back and watch!</span><br>
        Hit wall or body → lose point`,
   },
@@ -172,8 +172,8 @@ const I18N = {
   'ja': {
     title:         'スネークバトル',
     btnPvp:        '1P vs 2P',
-    btnPvc:        '1P vs CPU',
-    btnCvc:        'CPU vs CPU',
+    btnPvc:        '1P vs AI',
+    btnCvc:        'AI vs AI',
     speedLabel:    'スピード：',
     speedSlow:     'スロー',
     speedNormal:   'ノーマル',
@@ -192,7 +192,7 @@ const I18N = {
     pauseSubTouch: '⏸ で再開',
     pauseSubKey:   'P で再開',
     respawning:    '復活中...',
-    p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
+    p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
     rotateHint: '縦向きに回転してください',
     hintPvpTouch:
       `<span class="c-p1">● P1：上のタッチパッドをスワイプ</span><br>
@@ -204,15 +204,15 @@ const I18N = {
        壁・自分・相手に当たる → 減点<br>エサを先取り → 得点`,
     hintPvcTouch:
       `<span class="c-p1">● P1：画面をスワイプして操作</span><br>
-       <span class="c-p2">● CPU：自動でエサを追跡</span><br><br>
+       <span class="c-p2">● AI：自動でエサを追跡</span><br><br>
        壁・相手に当たる → 減点して復活`,
     hintPvcKey:
       `<span class="c-p1">● P1：WASD または矢印キー</span><br>
-       <span class="c-p2">● CPU：自動でエサを追跡</span><br><br>
+       <span class="c-p2">● AI：自動でエサを追跡</span><br><br>
        壁・自分・相手に当たる → 減点`,
     hintCvc:
-      `<span class="c-p1">● CPU1：自動でエサを追跡</span><br>
-       <span class="c-p2">● CPU2：自動でエサを追跡</span><br><br>
+      `<span class="c-p1">● AI 1：自動でエサを追跡</span><br>
+       <span class="c-p2">● AI 2：自動でエサを追跡</span><br><br>
        <span class="c-accent">🤖 観戦モード — 見ているだけでOK！</span><br>
        壁や体に当たる → 減点`,
   },
@@ -220,8 +220,8 @@ const I18N = {
   'ko': {
     title:         '스네이크 배틀',
     btnPvp:        '1P vs 2P',
-    btnPvc:        '1P vs CPU',
-    btnCvc:        'CPU vs CPU',
+    btnPvc:        '1P vs AI',
+    btnCvc:        'AI vs AI',
     speedLabel:    '속도：',
     speedSlow:     '느림',
     speedNormal:   '보통',
@@ -240,7 +240,7 @@ const I18N = {
     pauseSubTouch: '⏸ 탭하여 재개',
     pauseSubKey:   'P 재개',
     respawning:    '부활 중...',
-    p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
+    p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
     rotateHint: '세로 방향으로 회전해 주세요',
     hintPvpTouch:
       `<span class="c-p1">● P1: 위 터치패드 스와이프</span><br>
@@ -252,15 +252,15 @@ const I18N = {
        벽·자신·상대에 충돌 → 감점<br>음식 먹기 → 득점`,
     hintPvcTouch:
       `<span class="c-p1">● P1: 화면 스와이프로 조작</span><br>
-       <span class="c-p2">● CPU: 자동으로 음식 추적</span><br><br>
+       <span class="c-p2">● AI: 자동으로 음식 추적</span><br><br>
        벽·상대에 충돌 → 감점 후 부활`,
     hintPvcKey:
       `<span class="c-p1">● P1: WASD 또는 방향키</span><br>
-       <span class="c-p2">● CPU: 자동으로 음식 추적</span><br><br>
+       <span class="c-p2">● AI: 자동으로 음식 추적</span><br><br>
        벽·자신·상대에 충돌 → 감점`,
     hintCvc:
-      `<span class="c-p1">● CPU1: 자동으로 음식 추적</span><br>
-       <span class="c-p2">● CPU2: 자동으로 음식 추적</span><br><br>
+      `<span class="c-p1">● AI 1: 자동으로 음식 추적</span><br>
+       <span class="c-p2">● AI 2: 자동으로 음식 추적</span><br><br>
        <span class="c-accent">🤖 관전 모드 — 그냥 구경하세요!</span><br>
        벽이나 몸에 충돌 → 감점`,
   },
@@ -268,8 +268,8 @@ const I18N = {
   'zh-CN': {
     title:         '贪食蛇对战',
     btnPvp:        '1P vs 2P',
-    btnPvc:        '1P vs 电脑',
-    btnCvc:        '电脑 vs 电脑',
+    btnPvc:        '1P vs AI',
+    btnCvc:        'AI vs AI',
     speedLabel:    '速度：',
     speedSlow:     '慢速',
     speedNormal:   '正常',
@@ -288,7 +288,7 @@ const I18N = {
     pauseSubTouch: '再按 ⏸ 继续',
     pauseSubKey:   '按 P 继续',
     respawning:    '重生中...',
-    p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
+    p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
     rotateHint: '请旋转手机为竖向',
     hintPvpTouch:
       `<span class="c-p1">● 玩家1：上方触控板滑动</span><br>
@@ -300,15 +300,15 @@ const I18N = {
        撞墙、撞自己或对方蛇身 → 扣分并重生<br>抢先吃到食物 → 得分`,
     hintPvcTouch:
       `<span class="c-p1">● 玩家1：在画面任意滑动操控</span><br>
-       <span class="c-p2">● 电脑：自动追踪食物</span><br><br>
+       <span class="c-p2">● AI：自动追踪食物</span><br><br>
        撞墙或对方 → 扣分并重生`,
     hintPvcKey:
       `<span class="c-p1">● 玩家1：WASD 或方向键</span><br>
-       <span class="c-p2">● 电脑：自动追踪食物</span><br><br>
+       <span class="c-p2">● AI：自动追踪食物</span><br><br>
        撞墙、撞自己或对方蛇身 → 扣分并重生`,
     hintCvc:
-      `<span class="c-p1">● CPU1：自动追踪食物</span><br>
-       <span class="c-p2">● CPU2：自动追踪食物</span><br><br>
+      `<span class="c-p1">● AI 1：自动追踪食物</span><br>
+       <span class="c-p2">● AI 2：自动追踪食物</span><br><br>
        <span class="c-accent">🤖 纯观战模式，完全不需动手！</span><br>
        撞墙、撞自己或对方蛇身 → 扣分并重生`,
   },
