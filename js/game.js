@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────
 const COLS   = 30;
 const ROWS   = 25;
-const DPAD_H = 162;   // px height of one joystick zone (pvp only now)
+const DPAD_H = 100;   // px height of one touchpad zone (pvp only)
 
 let CELL = 20;
 let W    = COLS * CELL;
@@ -96,8 +96,8 @@ const I18N = {
     respawning:    '重生中...',
     p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
     hintPvpTouch:
-      `<span class="c-p1">● 玩家1：上方搖桿</span><br>
-       <span class="c-p2">● 玩家2：下方搖桿</span><br><br>
+      `<span class="c-p1">● 玩家1：上方觸控板滑動</span><br>
+       <span class="c-p2">● 玩家2：下方觸控板滑動</span><br><br>
        撞牆或對方 → 扣分並重生　搶食物 → 得分`,
     hintPvpKey:
       `<span class="c-p1">● 玩家1：WASD 移動</span><br>
@@ -143,8 +143,8 @@ const I18N = {
     respawning:    'Respawning...',
     p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
     hintPvpTouch:
-      `<span class="c-p1">● P1: Top joystick</span><br>
-       <span class="c-p2">● P2: Bottom joystick</span><br><br>
+      `<span class="c-p1">● P1: Swipe on top pad</span><br>
+       <span class="c-p2">● P2: Swipe on bottom pad</span><br><br>
        Hit wall or opponent → lose point &amp; respawn<br>Eat food first → gain point`,
     hintPvpKey:
       `<span class="c-p1">● P1: WASD keys</span><br>
@@ -190,8 +190,8 @@ const I18N = {
     respawning:    '復活中...',
     p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
     hintPvpTouch:
-      `<span class="c-p1">● P1：上のジョイスティック</span><br>
-       <span class="c-p2">● P2：下のジョイスティック</span><br><br>
+      `<span class="c-p1">● P1：上のタッチパッドをスワイプ</span><br>
+       <span class="c-p2">● P2：下のタッチパッドをスワイプ</span><br><br>
        壁・相手に当たる → 減点して復活　エサを先取り → 得点`,
     hintPvpKey:
       `<span class="c-p1">● P1：WASD キー</span><br>
@@ -237,8 +237,8 @@ const I18N = {
     respawning:    '부활 중...',
     p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
     hintPvpTouch:
-      `<span class="c-p1">● P1: 위쪽 조이스틱</span><br>
-       <span class="c-p2">● P2: 아래쪽 조이스틱</span><br><br>
+      `<span class="c-p1">● P1: 위 터치패드 스와이프</span><br>
+       <span class="c-p2">● P2: 아래 터치패드 스와이프</span><br><br>
        벽·상대에 충돌 → 감점 후 부활　음식 먹기 → 득점`,
     hintPvpKey:
       `<span class="c-p1">● P1: WASD 키</span><br>
@@ -284,8 +284,8 @@ const I18N = {
     respawning:    '重生中...',
     p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
     hintPvpTouch:
-      `<span class="c-p1">● 玩家1：上方摇杆</span><br>
-       <span class="c-p2">● 玩家2：下方摇杆</span><br><br>
+      `<span class="c-p1">● 玩家1：上方触控板滑动</span><br>
+       <span class="c-p2">● 玩家2：下方触控板滑动</span><br><br>
        撞墙或对方 → 扣分并重生　抢食物 → 得分`,
     hintPvpKey:
       `<span class="c-p1">● 玩家1：WASD 移动</span><br>
@@ -422,7 +422,7 @@ function startGame() {
 }
 
 // ─────────────────────────────────────────────
-// Joystick zones (pvp only; pvc uses full-screen swipe)
+// Touchpad zones (pvp only; pvc uses full-screen swipe)
 // ─────────────────────────────────────────────
 function setupDpads() {
   const touch   = isTouch();
@@ -435,35 +435,10 @@ function setupDpads() {
   if (!touch) return;
 
   if (mode === 'pvp') {
-    topZone.classList.remove('hidden');   // P1 joystick top
-    botZone.classList.remove('hidden');   // P2 joystick bottom
-    setBottomDpadPlayer(2);
+    topZone.classList.remove('hidden');   // P1 touchpad top
+    botZone.classList.remove('hidden');   // P2 touchpad bottom
   }
-  // pvc & cvc: no joystick zones — pvc uses full-screen swipe
-}
-
-/**
- * Which player the bottom joystick controls (1 or 2).
- */
-let bottomJoyPlayer = 2;
-
-function setBottomDpadPlayer(p) {
-  bottomJoyPlayer = p;
-  const label   = document.getElementById('dpad-bottom-label');
-  const joyBase = document.getElementById('joy2-base');
-  const joyKnob = document.getElementById('joy2-knob');
-
-  if (p === 1) {
-    label.textContent = T('p1');
-    label.className   = 'dpad-label c-p1';
-    joyBase.className = 'joy-base';
-    joyKnob.className = 'joy-knob';
-  } else {
-    label.textContent = T('p2');
-    label.className   = 'dpad-label c-p2';
-    joyBase.className = 'joy-base p2';
-    joyKnob.className = 'joy-knob p2';
-  }
+  // pvc & cvc: no touchpad zones — pvc uses full-screen swipe
 }
 
 // ─────────────────────────────────────────────
@@ -897,76 +872,58 @@ function shadeColor(hex, ratio) {
 }
 
 // ─────────────────────────────────────────────
-// Joystick setup
+// Touchpad setup (pvp: each player gets a swipe strip)
 // ─────────────────────────────────────────────
-function setupJoystick(baseId, knobId, getPlayerFn) {
-  const base = document.getElementById(baseId);
-  const knob = document.getElementById(knobId);
-  if (!base || !knob) return;
+/**
+ * Attach swipe-to-steer logic to a touchpad element.
+ * getPlayerFn() returns 1 or 2 to identify which snake to steer.
+ * Supports both quick swipes (touchstart→end) and continuous drag (touchmove).
+ */
+function setupTouchpad(padId, getPlayerFn) {
+  const pad = document.getElementById(padId);
+  if (!pad) return;
 
-  const R    = 52;
-  const DEAD = 14;
-  let touchId = null;
-  let centerX = 0;
-  let centerY = 0;
-  let lastDir = null;
+  const THRESHOLD = 16;   // px drag before a direction registers
+  let touchId = null, startX = 0, startY = 0;
 
-  function getCenter() {
-    const rect = base.getBoundingClientRect();
-    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-  }
-
-  function moveKnob(dx, dy) {
-    const dist  = Math.hypot(dx, dy);
-    const ratio = Math.min(dist, R) / (dist || 1);
-    const ox    = dx * ratio;
-    const oy    = dy * ratio;
-    knob.style.transform = `translate(calc(-50% + ${ox}px), calc(-50% + ${oy}px))`;
-
-    if (dist < DEAD) { lastDir = null; return; }
-
-    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-    const dir =
-      angle > -45  && angle <=  45  ? 'RIGHT' :
-      angle >  45  && angle <= 135  ? 'DOWN'  :
-      angle > -135 && angle <= -45  ? 'UP'    : 'LEFT';
-
-    if (dir !== lastDir) {
-      lastDir = dir;
-      const player = getPlayerFn();
-      const snake  = player === 1 ? snake1 : snake2;
-      if (snake?.alive) pushDir(snake, dir);
+  function steer(clientX, clientY) {
+    const dx = clientX - startX;
+    const dy = clientY - startY;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < THRESHOLD) return;
+    const snake = getPlayerFn() === 1 ? snake1 : snake2;
+    if (snake?.alive) {
+      pushDir(snake, Math.abs(dx) > Math.abs(dy)
+        ? (dx > 0 ? 'RIGHT' : 'LEFT')
+        : (dy > 0 ? 'DOWN'  : 'UP'));
     }
+    // Reset reference point so each subsequent drag segment works
+    startX = clientX;
+    startY = clientY;
   }
 
-  function resetKnob() {
-    knob.style.transform = 'translate(-50%, -50%)';
-    lastDir = null;
-    touchId = null;
-  }
-
-  base.addEventListener('touchstart', e => {
+  pad.addEventListener('touchstart', e => {
     e.preventDefault();
     if (touchId !== null) return;
     const t = e.changedTouches[0];
     touchId = t.identifier;
-    const c = getCenter();
-    centerX = c.x; centerY = c.y;
-    moveKnob(t.clientX - centerX, t.clientY - centerY);
+    startX  = t.clientX;
+    startY  = t.clientY;
   }, { passive: false });
 
-  base.addEventListener('touchmove', e => {
+  pad.addEventListener('touchmove', e => {
     e.preventDefault();
     const t = [...e.changedTouches].find(tt => tt.identifier === touchId);
+    if (t) steer(t.clientX, t.clientY);
+  }, { passive: false });
+
+  pad.addEventListener('touchend', e => {
+    const t = [...e.changedTouches].find(tt => tt.identifier === touchId);
     if (!t) return;
-    moveKnob(t.clientX - centerX, t.clientY - centerY);
+    steer(t.clientX, t.clientY);
+    touchId = null;
   }, { passive: false });
 
-  base.addEventListener('touchend', e => {
-    if ([...e.changedTouches].some(tt => tt.identifier === touchId)) resetKnob();
-  }, { passive: false });
-
-  base.addEventListener('touchcancel', () => resetKnob(), { passive: false });
+  pad.addEventListener('touchcancel', () => { touchId = null; }, { passive: false });
 }
 
 // ─────────────────────────────────────────────
@@ -984,5 +941,5 @@ if (_wwBtn) { _wwBtn.classList.add('active'); }
 setLang('zh-TW');
 setMode('pvc');
 
-setupJoystick('joy1-base', 'joy1-knob', () => 1);
-setupJoystick('joy2-base', 'joy2-knob', () => bottomJoyPlayer);
+setupTouchpad('touchpad1', () => 1);
+setupTouchpad('touchpad2', () => 2);

@@ -4,6 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>貪食蛇對戰</title>
+
+  <!-- Favicon — SVG (snake emoji, modern browsers) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐍</text></svg>">
+
+  <!-- iOS / iPadOS home-screen icon -->
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+  <!-- PWA: standalone app behaviour -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Snake">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1A5472">
+
+  <!-- PWA manifest (Android Chrome "Add to Home Screen") -->
+  <link rel="manifest" href="manifest.json">
+
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="light">
@@ -89,13 +106,11 @@
     </div>
   </div>
 
-  <!-- ── Top joystick: P1 (pvp mode only) ── -->
+  <!-- ── Top touchpad: P1 (pvp mode only) ── -->
   <div id="dpad-top" class="dpad-zone hidden">
-    <div class="joy-wrap">
+    <div class="touchpad-wrap">
       <div class="dpad-label c-p1">P1</div>
-      <div class="joy-base" id="joy1-base">
-        <div class="joy-knob" id="joy1-knob"></div>
-      </div>
+      <div class="touchpad" id="touchpad1"></div>
     </div>
   </div>
 
@@ -103,13 +118,11 @@
   <canvas id="canvas"></canvas>
   <div id="status"></div>
 
-  <!-- ── Bottom joystick: P2 (pvp only) ── -->
+  <!-- ── Bottom touchpad: P2 (pvp only) ── -->
   <div id="dpad-bottom" class="dpad-zone hidden">
-    <div class="joy-wrap">
+    <div class="touchpad-wrap">
       <div class="dpad-label c-p2" id="dpad-bottom-label">P2</div>
-      <div class="joy-base p2" id="joy2-base">
-        <div class="joy-knob p2" id="joy2-knob"></div>
-      </div>
+      <div class="touchpad p2" id="touchpad2"></div>
     </div>
   </div>
 

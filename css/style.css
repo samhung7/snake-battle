@@ -364,22 +364,23 @@ select {
 }
 
 /* ═══════════════════════════════════════════
-   Joystick zones
+   Touchpad zones (pvp: two swipe strips)
 ═══════════════════════════════════════════ */
 .dpad-zone {
   display: none;    /* shown via pointer:coarse */
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   width: 100%;
-  padding: 6px 0 8px;
+  padding: 4px 10px 6px;
   flex-shrink: 0;
 }
 
-.joy-wrap {
+.touchpad-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  width: 100%;
 }
 
 .dpad-label {
@@ -389,39 +390,44 @@ select {
   opacity: 0.85;
 }
 
-/* Base circle */
-.joy-base {
-  width:  120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 2px solid var(--d1b);
+/* Swipe strip */
+.touchpad {
+  width: 100%;
+  height: 66px;
+  border-radius: 12px;
+  border: 1.5px solid var(--d1b);
   background: var(--d1bg);
-  position: relative;
   touch-action: none;
-  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
 }
 
-.joy-base.p2 {
+.touchpad.p2 {
   border-color: var(--d2b);
   background:   var(--d2bg);
 }
 
-/* Knob */
-.joy-knob {
-  width:  48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--d1b);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+/* Subtle directional hint drawn with CSS */
+.touchpad::after {
+  content: '↑\A←   →\A↓';
+  white-space: pre;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  line-height: 1.35;
+  font-size: 0.82rem;
+  color: var(--d1c);
+  opacity: 0.18;
   pointer-events: none;
-  transition: transform 0.04s linear;
+  position: absolute;
+  inset: 0;
 }
 
-.joy-knob.p2 {
-  background: var(--d2b);
+.touchpad.p2::after {
+  color: var(--d2c);
 }
 
 /* ═══════════════════════════════════════════
@@ -469,7 +475,6 @@ body.light #overlay { background: rgba(237,229,210,0.94); }
 
 /* Extra-small phones */
 @media (max-width: 360px) {
-  .joy-base { width: 100px; height: 100px; }
-  .joy-knob { width: 40px;  height: 40px;  }
+  .touchpad { height: 54px; }
   .btn      { padding: 8px 12px; }
 }
