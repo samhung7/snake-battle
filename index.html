@@ -36,6 +36,22 @@
     </select>
   </div>
 
+  <!-- Wall-wrap mode toggle -->
+  <div class="menu-option-row">
+    <span class="menu-option-label">穿牆模式</span>
+    <button class="btn btn-2" id="wall-wrap-btn" onclick="toggleWallWrap()">關閉</button>
+  </div>
+
+  <!-- Food count selector -->
+  <div class="menu-option-row">
+    <span class="menu-option-label">食物數量</span>
+    <div class="counter">
+      <button class="counter-btn" id="food-minus" onclick="adjustFood(-1)" disabled>−</button>
+      <span   class="counter-val" id="food-count-display">3</span>
+      <button class="counter-btn" id="food-plus"  onclick="adjustFood(1)">＋</button>
+    </div>
+  </div>
+
   <button class="btn btn-1" onclick="startGame()">開始遊戲</button>
 
   <div class="controls-hint" id="controls-hint">

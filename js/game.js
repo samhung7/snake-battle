@@ -69,11 +69,13 @@ function toggleTheme() {
 // ─────────────────────────────────────────────
 // Game state
 // ─────────────────────────────────────────────
-let mode         = 'pvp';    // 'pvp' | 'pvc' | 'cvc'
+let mode         = 'pvc';    // 'pvp' | 'pvc' | 'cvc'
 let gameLoop     = null;
 let paused       = false;
 let gameOver     = false;
 let tickInterval = 100;
+let wallWrap     = false;    // wrap-through-walls mode
+let foodCount    = 3;        // number of food items on field (1–10)
 let snake1, snake2, foods, score1, score2;
 
 const canvas = document.getElementById('canvas');
@@ -235,6 +237,26 @@ function togglePause() {
 }
 
 // ─────────────────────────────────────────────
+// Wall-wrap mode
+// ─────────────────────────────────────────────
+function toggleWallWrap() {
+  wallWrap = !wallWrap;
+  const btn = document.getElementById('wall-wrap-btn');
+  btn.textContent = wallWrap ? '開啟 ✓' : '關閉';
+  btn.classList.toggle('active', wallWrap);
+}
+
+// ─────────────────────────────────────────────
+// Food count selector
+// ─────────────────────────────────────────────
+function adjustFood(delta) {
+  foodCount = Math.max(1, Math.min(10, foodCount + delta));
+  document.getElementById('food-count-display').textContent = foodCount;
+  document.getElementById('food-minus').disabled = foodCount <= 1;
+  document.getElementById('food-plus').disabled  = foodCount >= 10;
+}
+
+// ─────────────────────────────────────────────
 // Game initialisation
 // ─────────────────────────────────────────────
 function makeSnake(sx, sy, dir, id) {
@@ -258,7 +280,7 @@ function initGame() {
   snake1 = makeSnake(7,  12, 'RIGHT', 1);
   snake2 = makeSnake(22, 12, 'LEFT',  2);
   foods  = [];
-  spawnFood(); spawnFood(); spawnFood();
+  for (let i = 0; i < foodCount; i++) spawnFood();
 
   stopGame();
   gameLoop = setInterval(tick, tickInterval);
@@ -447,7 +469,7 @@ function tick() {
   checkCollision(snake2, snake1);
   checkFood(snake1, 1);
   checkFood(snake2, 2);
-  while (foods.length < 3) spawnFood();
+  while (foods.length < foodCount) spawnFood();
 
   updateScoreDisplay();
   draw();
@@ -470,7 +492,14 @@ function moveSnake(s) {
   }
   const [hx, hy] = s.body[0];
   const [dx, dy] = DIR[s.dir];
-  s.body.unshift([hx + dx, hy + dy]);
+  let nx = hx + dx;
+  let ny = hy + dy;
+  // Wrap-through-walls: emerge from the opposite side
+  if (wallWrap) {
+    nx = (nx + COLS) % COLS;
+    ny = (ny + ROWS) % ROWS;
+  }
+  s.body.unshift([nx, ny]);
   s.body.pop();
 }
 
@@ -478,7 +507,8 @@ function checkCollision(s, other) {
   if (!s.alive) return;
   const [hx, hy] = s.body[0];
 
-  if (hx < 0 || hy < 0 || hx >= COLS || hy >= ROWS) { killSnake(s); return; }
+  // Wall collision — skipped in wrap mode
+  if (!wallWrap && (hx < 0 || hy < 0 || hx >= COLS || hy >= ROWS)) { killSnake(s); return; }
 
   for (let i = 1; i < s.body.length; i++)
     if (s.body[i][0] === hx && s.body[i][1] === hy) { killSnake(s); return; }
@@ -643,4 +673,4 @@ function shadeColor(hex, ratio) {
 // ─────────────────────────────────────────────
 // Boot
 // ─────────────────────────────────────────────
-setMode('pvp');
+setMode('pvc');

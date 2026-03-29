@@ -234,6 +234,63 @@ select {
   line-height: 1.9;
 }
 
+/* ── Menu option rows (wall-wrap, food count) ── */
+.menu-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.menu-option-label {
+  font-size: clamp(0.70rem, 2.8vw, 0.84rem);
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+/* Food counter */
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid var(--btn2-c);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.counter-btn {
+  width: 36px;
+  height: 34px;
+  background: transparent;
+  border: none;
+  color: var(--btn2-c);
+  font-size: 1.2rem;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.counter-btn:hover:not(:disabled) { background: var(--btn2-bg); }
+.counter-btn:disabled { opacity: 0.30; cursor: default; }
+
+.counter-val {
+  min-width: 28px;
+  text-align: center;
+  font-size: clamp(0.80rem, 3vw, 0.95rem);
+  color: var(--text);
+  border-left: 1px solid var(--btn2-c);
+  border-right: 1px solid var(--btn2-c);
+  padding: 0 4px;
+  line-height: 34px;
+}
+
 /* ═══════════════════════════════════════════
    Game screen
 ═══════════════════════════════════════════ */
