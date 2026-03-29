@@ -82,6 +82,10 @@ body.light {
   margin: 0; padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+  /* Prevent text selection / long-press callout on every element */
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 body {
@@ -96,7 +100,6 @@ body {
   min-height: 100dvh;
   overflow: hidden;
   touch-action: none;
-  user-select: none;
   transition: background 0.25s, color 0.25s;
 }
 
@@ -311,6 +314,8 @@ select {
   align-items: center;
   width: 100%;
   gap: 0;
+  /* Claim all touch gestures so the browser won't scroll/zoom under a swipe */
+  touch-action: none;
 }
 
 /* Top bar: scoreboard + action buttons */

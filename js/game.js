@@ -591,22 +591,26 @@ document.addEventListener('keydown', e => {
 });
 
 // ─────────────────────────────────────────────
-// Input — touch swipe (pvc: full-screen, anywhere except joystick/buttons)
+// Input — touch swipe (pvc: TRUE full-screen, registered on document)
 // ─────────────────────────────────────────────
 let swipeX = 0, swipeY = 0, swipePending = false;
-const gameEl = document.getElementById('game-container');
 
-gameEl.addEventListener('touchstart', e => {
-  if (e.target.closest('button, .joy-base')) return;
+// Use document so the swipe zone covers the entire viewport, including
+// areas outside #game-container (status bar, safe areas, etc.)
+document.addEventListener('touchstart', e => {
+  // Ignore touches on interactive widgets (buttons, joystick base, selects)
+  if (e.target.closest('button, .joy-base, select')) return;
   swipeX = e.touches[0].clientX;
   swipeY = e.touches[0].clientY;
   swipePending = true;
 }, { passive: true });
 
-gameEl.addEventListener('touchend', e => {
+document.addEventListener('touchend', e => {
   if (!swipePending) return;
   swipePending = false;
+  // Only act in pvc mode while the game screen is visible and snake is alive
   if (mode !== 'pvc' || !snake1?.alive) return;
+  if (document.getElementById('game-container').style.display === 'none') return;
   const dx = e.changedTouches[0].clientX - swipeX;
   const dy = e.changedTouches[0].clientY - swipeY;
   if (Math.max(Math.abs(dx), Math.abs(dy)) < 18) return;
@@ -614,6 +618,9 @@ gameEl.addEventListener('touchend', e => {
     ? (dx > 0 ? 'RIGHT' : 'LEFT')
     : (dy > 0 ? 'DOWN'  : 'UP'));
 }, { passive: true });
+
+// Prevent context menu / long-press callout anywhere on screen
+document.addEventListener('contextmenu', e => e.preventDefault());
 
 // Pause button — fast touch response
 document.getElementById('pause-btn').addEventListener('touchstart', e => {
