@@ -7,7 +7,9 @@
 // ─────────────────────────────────────────────
 const COLS   = 30;
 const ROWS   = 25;
-const DPAD_H = 100;   // px height of one touchpad zone (pvp only)
+const DPAD_H     = 100;   // px — not used directly for pvp-touch (flex fills)
+const PVP_BAR_H  = 40;    // px height of each pvp score bar
+const MIN_PAD_H  = 80;    // px minimum touchpad height reserved per side
 
 let CELL = 20;
 let W    = COLS * CELL;
@@ -95,6 +97,7 @@ const I18N = {
     pauseSubKey:   '按 P 繼續',
     respawning:    '重生中...',
     p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
+    rotateHint: '請旋轉手機為直向',
     hintPvpTouch:
       `<span class="c-p1">● 玩家1：上方觸控板滑動</span><br>
        <span class="c-p2">● 玩家2：下方觸控板滑動</span><br><br>
@@ -142,6 +145,7 @@ const I18N = {
     pauseSubKey:   'P to resume',
     respawning:    'Respawning...',
     p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
+    rotateHint: 'Please rotate to portrait',
     hintPvpTouch:
       `<span class="c-p1">● P1: Swipe on top pad</span><br>
        <span class="c-p2">● P2: Swipe on bottom pad</span><br><br>
@@ -189,6 +193,7 @@ const I18N = {
     pauseSubKey:   'P で再開',
     respawning:    '復活中...',
     p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
+    rotateHint: '縦向きに回転してください',
     hintPvpTouch:
       `<span class="c-p1">● P1：上のタッチパッドをスワイプ</span><br>
        <span class="c-p2">● P2：下のタッチパッドをスワイプ</span><br><br>
@@ -236,6 +241,7 @@ const I18N = {
     pauseSubKey:   'P 재개',
     respawning:    '부활 중...',
     p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
+    rotateHint: '세로 방향으로 회전해 주세요',
     hintPvpTouch:
       `<span class="c-p1">● P1: 위 터치패드 스와이프</span><br>
        <span class="c-p2">● P2: 아래 터치패드 스와이프</span><br><br>
@@ -283,6 +289,7 @@ const I18N = {
     pauseSubKey:   '按 P 继续',
     respawning:    '重生中...',
     p1: 'P1', p2: 'P2', cpu: 'CPU', cpu1: 'CPU1', cpu2: 'CPU2',
+    rotateHint: '请旋转手机为竖向',
     hintPvpTouch:
       `<span class="c-p1">● 玩家1：上方触控板滑动</span><br>
        <span class="c-p2">● 玩家2：下方触控板滑动</span><br><br>
@@ -353,16 +360,20 @@ function isTouch() {
 }
 
 function computeCell() {
-  const touch    = isTouch();
-  // Joystick zones only shown in pvp (top + bottom); pvc uses full-screen swipe
-  const topDpadH = touch && mode === 'pvp' ? DPAD_H : 0;
-  const botDpadH = touch && mode === 'pvp' ? DPAD_H : 0;
-  const barH     = 48;
-  const statH    = touch ? 0 : 26;
-  const padH     = 10;
+  const touch = isTouch();
+  let barH = 48, topH = 0, botH = 0;
 
-  const availW = window.innerWidth  - (touch ? 8  : 20);
-  const availH = window.innerHeight - barH - topDpadH - botDpadH - statH - padH;
+  if (touch && mode === 'pvp') {
+    // pvp-touch: regular topbar is hidden; pvp score bars + min touchpad reserved
+    barH = 0;
+    topH = PVP_BAR_H + MIN_PAD_H;   // pvp-bar-top + minimum touchpad1 height
+    botH = MIN_PAD_H + PVP_BAR_H;   // minimum touchpad2 height + pvp-bar-bottom
+  }
+
+  const statH  = touch ? 0 : 26;
+  const padH   = touch ? 6 : 10;
+  const availW = window.innerWidth  - (touch ? 4 : 20);
+  const availH = window.innerHeight - barH - topH - botH - statH - padH;
 
   CELL = Math.max(8, Math.floor(Math.min(availW / COLS, availH / ROWS)));
   W    = COLS * CELL;
@@ -417,26 +428,51 @@ function startGame() {
     document.getElementById('status').textContent = T('statusNormal');
   }
 
+  lockPortrait();
   setupDpads();
   initGame();
 }
 
 // ─────────────────────────────────────────────
-// Touchpad zones (pvp only; pvc uses full-screen swipe)
+// Portrait orientation lock
+// ─────────────────────────────────────────────
+function lockPortrait() {
+  try {
+    if (screen.orientation?.lock) {
+      screen.orientation.lock('portrait-primary').catch(() => {});
+    }
+  } catch (_) {}
+}
+
+// ─────────────────────────────────────────────
+// Touchpad zones (pvp touch only; pvc uses full-screen swipe)
 // ─────────────────────────────────────────────
 function setupDpads() {
-  const touch   = isTouch();
-  const topZone = document.getElementById('dpad-top');
-  const botZone = document.getElementById('dpad-bottom');
+  const touch          = isTouch();
+  const topZone        = document.getElementById('dpad-top');
+  const botZone        = document.getElementById('dpad-bottom');
+  const pvpBarTop      = document.getElementById('pvp-bar-top');
+  const pvpBarBot      = document.getElementById('pvp-bar-bottom');
+  const gameTopbar     = document.getElementById('game-topbar');
+  const gameContainer  = document.getElementById('game-container');
 
+  // Reset all to defaults
   topZone.classList.add('hidden');
   botZone.classList.add('hidden');
+  pvpBarTop.classList.add('hidden');
+  pvpBarBot.classList.add('hidden');
+  gameTopbar.classList.remove('hidden');
+  gameContainer.classList.remove('pvp-touch');
 
   if (!touch) return;
 
   if (mode === 'pvp') {
-    topZone.classList.remove('hidden');   // P1 touchpad top
-    botZone.classList.remove('hidden');   // P2 touchpad bottom
+    topZone.classList.remove('hidden');     // P1 touchpad at top
+    botZone.classList.remove('hidden');     // P2 touchpad at bottom
+    pvpBarTop.classList.remove('hidden');   // score bar P1 perspective
+    pvpBarBot.classList.remove('hidden');   // score bar P2 perspective (rotated)
+    gameTopbar.classList.add('hidden');     // regular topbar hidden
+    gameContainer.classList.add('pvp-touch');
   }
   // pvc & cvc: no touchpad zones — pvc uses full-screen swipe
 }
@@ -447,8 +483,12 @@ function setupDpads() {
 function backToMenu() {
   stopGame();
   document.getElementById('overlay').classList.remove('visible');
-  document.getElementById('game-container').style.display = 'none';
-  document.getElementById('menu').style.display           = 'flex';
+  const gc = document.getElementById('game-container');
+  gc.style.display = 'none';
+  // Clean up pvp-touch layout state so next visit starts fresh
+  gc.classList.remove('pvp-touch');
+  document.getElementById('game-topbar').classList.remove('hidden');
+  document.getElementById('menu').style.display = 'flex';
 }
 
 function restartGame() {
@@ -458,7 +498,10 @@ function restartGame() {
 
 function togglePause() {
   paused = !paused;
-  document.getElementById('pause-btn').textContent = paused ? '▶' : '⏸';
+  const icon = paused ? '▶' : '⏸';
+  document.getElementById('pause-btn').textContent = icon;
+  const pvpBtn = document.getElementById('pvp-pause-btn');
+  if (pvpBtn) pvpBtn.textContent = icon;
 }
 
 // ─────────────────────────────────────────────
@@ -499,6 +542,8 @@ function initGame() {
   score1 = 0; score2 = 0;
   gameOver = false; paused = false;
   document.getElementById('pause-btn').textContent = '⏸';
+  const pvpBtn = document.getElementById('pvp-pause-btn');
+  if (pvpBtn) pvpBtn.textContent = '⏸';
   computeCell();
   updateScoreDisplay();
 
@@ -746,8 +791,14 @@ function checkFood(s, pNum) {
 }
 
 function updateScoreDisplay() {
-  document.getElementById('score1').textContent = score1;
-  document.getElementById('score2').textContent = score2;
+  // Update all score display elements (main + pvp bars top & bottom)
+  for (const [id, val] of [
+    ['score1',   score1], ['pvp-s1a', score1], ['pvp-s1b', score1],
+    ['score2',   score2], ['pvp-s2a', score2], ['pvp-s2b', score2],
+  ]) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -929,6 +980,21 @@ function setupTouchpad(padId, getPlayerFn) {
 // ─────────────────────────────────────────────
 // Boot
 // ─────────────────────────────────────────────
+
+// pvp pause button — fast touch response
+document.getElementById('pvp-pause-btn').addEventListener('touchstart', e => {
+  e.preventDefault();
+  togglePause();
+}, { passive: false });
+
+// pvp back buttons (class-based in case of multiple) — fast touch response
+document.querySelectorAll('.pvp-back-btn').forEach(btn => {
+  btn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    backToMenu();
+  }, { passive: false });
+});
+
 // Default: light theme
 document.body.classList.add('light');
 document.querySelectorAll('.theme-icon').forEach(el => { el.textContent = '🌙'; });

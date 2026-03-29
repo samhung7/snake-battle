@@ -91,7 +91,20 @@
 ════════════════════════════════════════ -->
 <div id="game-container">
 
-  <!-- Top bar: scores + controls -->
+  <!-- ── PVP bar top (touch pvp only): scores + action buttons, P1 perspective ── -->
+  <div id="pvp-bar-top" class="pvp-bar hidden">
+    <div class="pvp-bar-scores">
+      <span class="score-p1"><span data-i18n="p1">P1</span>: <span id="pvp-s1a">0</span></span>
+      <span class="score-p2"><span data-i18n="p2">P2</span>: <span id="pvp-s2a">0</span></span>
+    </div>
+    <div class="pvp-bar-btns">
+      <button class="icon-btn" onclick="toggleTheme()"><span class="theme-icon">🌙</span></button>
+      <button class="icon-btn" id="pvp-pause-btn" onclick="togglePause()">⏸</button>
+      <button class="icon-btn pvp-back-btn" onclick="backToMenu()">⌂</button>
+    </div>
+  </div>
+
+  <!-- Regular top bar: scores + controls (desktop + non-pvp touch) -->
   <div id="game-topbar">
     <div id="scoreboard">
       <span class="score-p1" id="p1-label">P1: <span id="score1">0</span></span>
@@ -106,10 +119,9 @@
     </div>
   </div>
 
-  <!-- ── Top touchpad: P1 (pvp mode only) ── -->
+  <!-- ── Top touchpad: P1 (pvp touch only) ── -->
   <div id="dpad-top" class="dpad-zone hidden">
     <div class="touchpad-wrap">
-      <div class="dpad-label c-p1">P1</div>
       <div class="touchpad" id="touchpad1"></div>
     </div>
   </div>
@@ -118,11 +130,18 @@
   <canvas id="canvas"></canvas>
   <div id="status"></div>
 
-  <!-- ── Bottom touchpad: P2 (pvp only) ── -->
+  <!-- ── Bottom touchpad: P2 (pvp touch only) ── -->
   <div id="dpad-bottom" class="dpad-zone hidden">
     <div class="touchpad-wrap">
-      <div class="dpad-label c-p2" id="dpad-bottom-label">P2</div>
       <div class="touchpad p2" id="touchpad2"></div>
+    </div>
+  </div>
+
+  <!-- ── PVP bar bottom (touch pvp only): same scores, rotated 180° for P2 perspective ── -->
+  <div id="pvp-bar-bottom" class="pvp-bar pvp-bar-flip hidden">
+    <div class="pvp-bar-scores">
+      <span class="score-p1"><span data-i18n="p1">P1</span>: <span id="pvp-s1b">0</span></span>
+      <span class="score-p2"><span data-i18n="p2">P2</span>: <span id="pvp-s2b">0</span></span>
     </div>
   </div>
 
@@ -136,6 +155,12 @@
   <p  id="overlay-msg"></p>
   <button class="btn btn-1" id="restart-btn" onclick="restartGame()" data-i18n="restartBtn">再玩一局</button>
   <button class="btn btn-2" id="menu-btn"    onclick="backToMenu()"  data-i18n="menuBtn">主選單</button>
+</div>
+
+<!-- Portrait-lock hint overlay — shown via CSS when phone is landscape -->
+<div id="rotate-hint">
+  <span id="rotate-icon">📱</span>
+  <p data-i18n="rotateHint">請旋轉手機為直向</p>
 </div>
 
 <script src="js/game.js"></script>

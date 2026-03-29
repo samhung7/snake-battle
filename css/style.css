@@ -318,6 +318,52 @@ select {
   touch-action: none;
 }
 
+/* pvp touch layout: fill the full viewport so touchpads can flex-grow */
+#game-container.pvp-touch {
+  min-height: 100dvh;
+  min-height: 100vh;
+  justify-content: flex-start;
+}
+
+/* In pvp-touch mode, hide the regular topbar (pvp-bar-top replaces it) */
+#game-container.pvp-touch #game-topbar { display: none; }
+
+/* Touchpad zones flex-grow to fill all remaining space equally */
+#game-container.pvp-touch .dpad-zone {
+  flex: 1;
+  min-height: 70px;
+  padding: 6px 10px;
+}
+
+/* ── PVP score bars ── */
+.pvp-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 12px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+/* Bottom bar is rotated so P2 (sitting at the bottom) can read it right-side up */
+.pvp-bar-flip {
+  transform: rotate(180deg);
+}
+
+.pvp-bar-scores {
+  display: flex;
+  gap: 20px;
+  font-size: clamp(0.74rem, 3.2vw, 0.94rem);
+  letter-spacing: 2px;
+}
+
+.pvp-bar-btns {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
 /* Top bar: scoreboard + action buttons */
 #game-topbar {
   display: flex;
@@ -379,8 +425,8 @@ select {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
   width: 100%;
+  height: 100%;
 }
 
 .dpad-label {
@@ -390,10 +436,11 @@ select {
   opacity: 0.85;
 }
 
-/* Swipe strip */
+/* Swipe strip — fills the full flex zone in pvp-touch mode */
 .touchpad {
   width: 100%;
-  height: 66px;
+  height: 66px;      /* fallback for non-pvp-touch */
+  flex: 1;           /* fills .touchpad-wrap height when dpad-zone has flex:1 */
   border-radius: 12px;
   border: 1.5px solid var(--d1b);
   background: var(--d1bg);
@@ -471,6 +518,45 @@ body.light #overlay { background: rgba(237,229,210,0.94); }
 @media (pointer: coarse) {
   .dpad-zone { display: flex; }
   #status    { display: none; }
+}
+
+/* ═══════════════════════════════════════════
+   Portrait lock — rotate hint overlay
+   Shown on touch devices in landscape orientation
+═══════════════════════════════════════════ */
+#rotate-hint {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--bg);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+}
+
+#rotate-icon {
+  font-size: 3rem;
+  animation: tilt 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes tilt {
+  from { transform: rotate(-20deg); }
+  to   { transform: rotate(20deg);  }
+}
+
+#rotate-hint p {
+  font-size: clamp(0.9rem, 4vw, 1.2rem);
+  color: var(--text-muted);
+  letter-spacing: 2px;
+}
+
+/* Show the hint whenever a touch device is held landscape */
+@media (pointer: coarse) and (orientation: landscape) {
+  #rotate-hint { display: flex; }
 }
 
 /* Extra-small phones */
