@@ -178,14 +178,25 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 10px;
   width: 100%;
   position: relative;
 }
 
+/* Theme toggle — far right */
 #menu-topbar .icon-btn {
   position: absolute;
   right: 0;
+}
+
+/* Language selector — far left */
+#lang-select {
+  position: absolute;
+  left: 0;
+  padding: 4px 6px;
+  font-size: clamp(0.62rem, 2.4vw, 0.76rem);
+  letter-spacing: 0;
+  min-width: 0;
 }
 
 h1 {

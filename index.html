@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>雙人貪食蛇</title>
+  <title>貪食蛇對戰</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="light">
 
 <!-- ═══════════════════════════════════════
      MENU
@@ -14,37 +14,48 @@
 <div id="menu">
 
   <div id="menu-topbar">
-    <h1>貪食蛇對戰</h1>
+    <!-- Language selector — left -->
+    <select id="lang-select" onchange="setLang(this.value)" title="Language">
+      <option value="zh-TW" selected>繁中</option>
+      <option value="zh-CN">简中</option>
+      <option value="en">EN</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+    </select>
+
+    <h1 data-i18n="title">貪食蛇對戰</h1>
+
+    <!-- Theme toggle — right -->
     <button class="icon-btn" onclick="toggleTheme()" title="切換主題">
-      <span class="theme-icon">☀</span>
+      <span class="theme-icon">🌙</span>
     </button>
   </div>
 
   <div class="mode-buttons">
-    <button class="btn btn-1 active" id="btn-pvp" onclick="setMode('pvp')">1P vs 2P</button>
-    <button class="btn btn-2"        id="btn-pvc" onclick="setMode('pvc')">1P vs 電腦</button>
-    <button class="btn btn-3"        id="btn-cvc" onclick="setMode('cvc')">電腦 vs 電腦</button>
+    <button class="btn btn-1" id="btn-pvp" onclick="setMode('pvp')" data-i18n="btnPvp">1P vs 2P</button>
+    <button class="btn btn-2" id="btn-pvc" onclick="setMode('pvc')" data-i18n="btnPvc">1P vs 電腦</button>
+    <button class="btn btn-3" id="btn-cvc" onclick="setMode('cvc')" data-i18n="btnCvc">電腦 vs 電腦</button>
   </div>
 
   <div class="speed-select">
-    <label>速度：</label>
+    <label id="speed-label" data-i18n="speedLabel">速度：</label>
     <select id="speed-select">
-      <option value="150">慢速</option>
-      <option value="100" selected>正常</option>
-      <option value="65">快速</option>
-      <option value="40">瘋狂</option>
+      <option value="150" data-i18n="speedSlow">慢速</option>
+      <option value="100" selected data-i18n="speedNormal">正常</option>
+      <option value="65"  data-i18n="speedFast">快速</option>
+      <option value="40"  data-i18n="speedCrazy">瘋狂</option>
     </select>
   </div>
 
   <!-- Wall-wrap mode toggle -->
   <div class="menu-option-row">
-    <span class="menu-option-label">穿牆模式</span>
-    <button class="btn btn-2" id="wall-wrap-btn" onclick="toggleWallWrap()">關閉</button>
+    <span class="menu-option-label" data-i18n="wallWrapLabel">穿牆模式</span>
+    <button class="btn btn-2 active" id="wall-wrap-btn" onclick="toggleWallWrap()" data-i18n="wallWrapOn">開啟 ✓</button>
   </div>
 
   <!-- Food count selector -->
   <div class="menu-option-row">
-    <span class="menu-option-label">食物數量</span>
+    <span class="menu-option-label" data-i18n="foodLabel">食物數量</span>
     <div class="counter">
       <button class="counter-btn" id="food-minus" onclick="adjustFood(-1)" disabled>−</button>
       <span   class="counter-val" id="food-count-display">3</span>
@@ -52,14 +63,9 @@
     </div>
   </div>
 
-  <button class="btn btn-1" onclick="startGame()">開始遊戲</button>
+  <button class="btn btn-1" id="start-btn" onclick="startGame()" data-i18n="startBtn">開始遊戲</button>
 
-  <div class="controls-hint" id="controls-hint">
-    <span class="c-p1">● 玩家1：WASD 移動</span><br>
-    <span class="c-p2">● 玩家2：方向鍵 移動</span><br><br>
-    撞牆、撞自己或對方蛇身 → 扣分並重生<br>
-    搶先吃到食物 → 得分
-  </div>
+  <div class="controls-hint" id="controls-hint"></div>
 
 </div>
 
@@ -76,10 +82,10 @@
     </div>
     <div id="game-actions">
       <button class="icon-btn" onclick="toggleTheme()" title="切換主題">
-        <span class="theme-icon">☀</span>
+        <span class="theme-icon">🌙</span>
       </button>
       <button class="icon-btn" id="pause-btn" onclick="togglePause()" title="暫停">⏸</button>
-      <button class="icon-btn" id="back-btn"  onclick="backToMenu()" title="回主選單">⌂</button>
+      <button class="icon-btn" id="back-btn"  onclick="backToMenu()"  title="回主選單">⌂</button>
     </div>
   </div>
 
@@ -95,9 +101,9 @@
 
   <!-- ── Canvas ── -->
   <canvas id="canvas"></canvas>
-  <div id="status">按 ESC 返回主選單 | 按 P 暫停</div>
+  <div id="status"></div>
 
-  <!-- ── Bottom joystick: P2 (pvp) / P1 (pvc) ── -->
+  <!-- ── Bottom joystick: P2 (pvp only) ── -->
   <div id="dpad-bottom" class="dpad-zone hidden">
     <div class="joy-wrap">
       <div class="dpad-label c-p2" id="dpad-bottom-label">P2</div>
@@ -115,8 +121,8 @@
 <div id="overlay">
   <h2 id="overlay-title"></h2>
   <p  id="overlay-msg"></p>
-  <button class="btn btn-1" onclick="restartGame()">再玩一局</button>
-  <button class="btn btn-2" onclick="backToMenu()">主選單</button>
+  <button class="btn btn-1" id="restart-btn" onclick="restartGame()" data-i18n="restartBtn">再玩一局</button>
+  <button class="btn btn-2" id="menu-btn"    onclick="backToMenu()"  data-i18n="menuBtn">主選單</button>
 </div>
 
 <script src="js/game.js"></script>
