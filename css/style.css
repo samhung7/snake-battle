@@ -348,22 +348,22 @@ select {
 }
 
 /* ═══════════════════════════════════════════
-   D-pad zones
+   Joystick zones
 ═══════════════════════════════════════════ */
 .dpad-zone {
   display: none;    /* shown via pointer:coarse */
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding: 5px 0 6px;
+  padding: 6px 0 8px;
   flex-shrink: 0;
 }
 
-.dpad-wrap {
+.joy-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .dpad-label {
@@ -373,60 +373,40 @@ select {
   opacity: 0.85;
 }
 
-/* 3×3 grid, only 4 directional cells + centre filled */
-.dpad {
-  --btn: 44px;
-  display: grid;
-  grid-template-areas:
-    ". up ."
-    "left mid right"
-    ". down .";
-  grid-template-columns: repeat(3, var(--btn));
-  grid-template-rows:    repeat(3, var(--btn));
-  gap: 4px;
-}
-
-.dpad-btn {
-  width:  var(--btn);
-  height: var(--btn);
-  border-radius: 8px;
-  border: 1.5px solid var(--d1b);
+/* Base circle */
+.joy-base {
+  width:  120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid var(--d1b);
   background: var(--d1bg);
-  color: var(--d1c);
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  touch-action: manipulation;
-  cursor: pointer;
-  transition: background 0.07s;
+  position: relative;
+  touch-action: none;
+  flex-shrink: 0;
 }
 
-.dpad-btn:active, .dpad-btn.pressed { background: var(--d1a); }
-
-/* P2 variant */
-.dpad-btn.p2 {
+.joy-base.p2 {
   border-color: var(--d2b);
   background:   var(--d2bg);
-  color:        var(--d2c);
 }
-.dpad-btn.p2:active, .dpad-btn.p2.pressed { background: var(--d2a); }
 
-/* Grid area assignments */
-.d-up    { grid-area: up;    }
-.d-down  { grid-area: down;  }
-.d-left  { grid-area: left;  }
-.d-right { grid-area: right; }
-
-.dpad-mid {
-  grid-area: mid;
-  width:  var(--btn);
-  height: var(--btn);
+/* Knob */
+.joy-knob {
+  width:  48px;
+  height: 48px;
   border-radius: 50%;
-  border: 1.5px solid var(--d1b);
-  opacity: 0.4;
+  background: var(--d1b);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: transform 0.04s linear;
 }
-.dpad-mid.p2 { border-color: var(--d2b); }
+
+.joy-knob.p2 {
+  background: var(--d2b);
+}
 
 /* ═══════════════════════════════════════════
    Overlay (game over / pause screen)
@@ -473,6 +453,7 @@ body.light #overlay { background: rgba(237,229,210,0.94); }
 
 /* Extra-small phones */
 @media (max-width: 360px) {
-  .dpad { --btn: 40px; }
-  .btn  { padding: 8px 12px; }
+  .joy-base { width: 100px; height: 100px; }
+  .joy-knob { width: 40px;  height: 40px;  }
+  .btn      { padding: 8px 12px; }
 }

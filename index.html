@@ -83,16 +83,12 @@
     </div>
   </div>
 
-  <!-- ── Top D-pad: P1 (pvp mode only) ── -->
+  <!-- ── Top joystick: P1 (pvp mode only) ── -->
   <div id="dpad-top" class="dpad-zone hidden">
-    <div class="dpad-wrap">
+    <div class="joy-wrap">
       <div class="dpad-label c-p1">P1</div>
-      <div class="dpad">
-        <button class="dpad-btn d-up"    data-player="1" data-dir="UP">▲</button>
-        <button class="dpad-btn d-left"  data-player="1" data-dir="LEFT">◀</button>
-        <div    class="dpad-mid"></div>
-        <button class="dpad-btn d-right" data-player="1" data-dir="RIGHT">▶</button>
-        <button class="dpad-btn d-down"  data-player="1" data-dir="DOWN">▼</button>
+      <div class="joy-base" id="joy1-base">
+        <div class="joy-knob" id="joy1-knob"></div>
       </div>
     </div>
   </div>
@@ -101,16 +97,12 @@
   <canvas id="canvas"></canvas>
   <div id="status">按 ESC 返回主選單 | 按 P 暫停</div>
 
-  <!-- ── Bottom D-pad: P2 (pvp) / P1 (pvc) ── -->
+  <!-- ── Bottom joystick: P2 (pvp) / P1 (pvc) ── -->
   <div id="dpad-bottom" class="dpad-zone hidden">
-    <div class="dpad-wrap">
+    <div class="joy-wrap">
       <div class="dpad-label c-p2" id="dpad-bottom-label">P2</div>
-      <div class="dpad">
-        <button class="dpad-btn d-up"    data-player="2" data-dir="UP">▲</button>
-        <button class="dpad-btn d-left"  data-player="2" data-dir="LEFT">◀</button>
-        <div    class="dpad-mid p2"      id="dpad-bottom-mid"></div>
-        <button class="dpad-btn d-right" data-player="2" data-dir="RIGHT">▶</button>
-        <button class="dpad-btn d-down"  data-player="2" data-dir="DOWN">▼</button>
+      <div class="joy-base p2" id="joy2-base">
+        <div class="joy-knob p2" id="joy2-knob"></div>
       </div>
     </div>
   </div>

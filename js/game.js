@@ -7,7 +7,7 @@
 // ─────────────────────────────────────────────
 const COLS   = 30;
 const ROWS   = 25;
-const DPAD_H = 174;   // px height of one D-pad zone (measured from CSS)
+const DPAD_H = 162;   // px height of one joystick zone (label + joy-base + padding)
 
 let CELL = 20;
 let W    = COLS * CELL;
@@ -195,24 +195,31 @@ function setupDpads() {
 }
 
 /**
- * Reconfigures the bottom D-pad buttons to control the given player (1 or 2).
- * Also updates label text and CSS class for the correct colour.
+ * Which player the bottom joystick controls (1 = P1, 2 = P2).
+ * Updated by setBottomDpadPlayer() before each game.
+ */
+let bottomJoyPlayer = 2;
+
+/**
+ * Reconfigures the bottom joystick to control the given player (1 or 2).
+ * Updates label text, colour classes, and the bottomJoyPlayer variable.
  */
 function setBottomDpadPlayer(p) {
-  const label = document.getElementById('dpad-bottom-label');
-  const btns  = document.querySelectorAll('#dpad-bottom .dpad-btn');
-  const mid   = document.getElementById('dpad-bottom-mid');
+  bottomJoyPlayer = p;
+  const label    = document.getElementById('dpad-bottom-label');
+  const joyBase  = document.getElementById('joy2-base');
+  const joyKnob  = document.getElementById('joy2-knob');
 
   if (p === 1) {
-    label.textContent = 'P1';
-    label.className   = 'dpad-label c-p1';
-    mid.className     = 'dpad-mid';
-    btns.forEach(b => { b.dataset.player = '1'; b.classList.remove('p2'); });
+    label.textContent  = 'P1';
+    label.className    = 'dpad-label c-p1';
+    joyBase.className  = 'joy-base';
+    joyKnob.className  = 'joy-knob';
   } else {
-    label.textContent = 'P2';
-    label.className   = 'dpad-label c-p2';
-    mid.className     = 'dpad-mid p2';
-    btns.forEach(b => { b.dataset.player = '2'; b.classList.add('p2'); });
+    label.textContent  = 'P2';
+    label.className    = 'dpad-label c-p2';
+    joyBase.className  = 'joy-base p2';
+    joyKnob.className  = 'joy-knob p2';
   }
 }
 
@@ -328,21 +335,27 @@ document.addEventListener('keydown', e => {
   if (KEY1[e.code] && snake1.alive)
     pushDir(snake1, KEY1[e.code]);
 
+  // pvp: arrow keys → P2
   if (mode === 'pvp' && KEY2[e.code] && snake2?.alive) {
     e.preventDefault();
     pushDir(snake2, KEY2[e.code]);
   }
+  // pvc: arrow keys also control P1 (same as WASD)
+  if (mode === 'pvc' && KEY2[e.code] && snake1.alive) {
+    e.preventDefault();
+    pushDir(snake1, KEY2[e.code]);
+  }
 });
 
 // ─────────────────────────────────────────────
-// Input — touch swipe (pvc: swipe ANYWHERE on game container)
+// Input — touch swipe fallback (pvc: anywhere except joystick / buttons)
 // ─────────────────────────────────────────────
 let swipeX = 0, swipeY = 0, swipePending = false;
 const gameEl = document.getElementById('game-container');
 
 gameEl.addEventListener('touchstart', e => {
-  // Ignore touches that land on buttons or D-pad dots
-  if (e.target.closest('button, .dpad-mid')) return;
+  // Ignore touches on buttons or joystick base (joystick handles its own input)
+  if (e.target.closest('button, .joy-base')) return;
   swipeX = e.touches[0].clientX;
   swipeY = e.touches[0].clientY;
   swipePending = true;
@@ -351,7 +364,7 @@ gameEl.addEventListener('touchstart', e => {
 gameEl.addEventListener('touchend', e => {
   if (!swipePending) return;
   swipePending = false;
-  // Only pvc: player can swipe anywhere to steer snake1
+  // pvc only: swipe anywhere (outside joystick) also steers snake1
   if (mode !== 'pvc' || !snake1?.alive) return;
   const dx = e.changedTouches[0].clientX - swipeX;
   const dy = e.changedTouches[0].clientY - swipeY;
@@ -360,25 +373,6 @@ gameEl.addEventListener('touchend', e => {
     ? (dx > 0 ? 'RIGHT' : 'LEFT')
     : (dy > 0 ? 'DOWN'  : 'UP'));
 }, { passive: true });
-
-// ─────────────────────────────────────────────
-// Input — D-pad buttons (touch)
-// ─────────────────────────────────────────────
-document.querySelectorAll('.dpad-btn').forEach(btn => {
-  btn.addEventListener('touchstart', e => {
-    e.preventDefault();
-    if (!snake1 || mode === 'cvc') return;
-    const p   = +btn.dataset.player;
-    const dir = btn.dataset.dir;
-    if (p === 2 && mode !== 'pvp') return;
-    const s = p === 1 ? snake1 : snake2;
-    if (s?.alive) pushDir(s, dir);
-    btn.classList.add('pressed');
-  }, { passive: false });
-
-  btn.addEventListener('touchend',    () => btn.classList.remove('pressed'));
-  btn.addEventListener('touchcancel', () => btn.classList.remove('pressed'));
-});
 
 // Pause button — fast touch response
 document.getElementById('pause-btn').addEventListener('touchstart', e => {
@@ -671,6 +665,85 @@ function shadeColor(hex, ratio) {
 }
 
 // ─────────────────────────────────────────────
+// Joystick setup
+// ─────────────────────────────────────────────
+/**
+ * Attach a virtual joystick to the given base/knob elements.
+ * getPlayerFn() is called on each move to get the target player (1 or 2).
+ */
+function setupJoystick(baseId, knobId, getPlayerFn) {
+  const base = document.getElementById(baseId);
+  const knob = document.getElementById(knobId);
+  if (!base || !knob) return;
+
+  const R    = 52;   // clamp radius in px (slightly less than base radius so knob stays inside)
+  const DEAD = 14;   // dead-zone radius in px
+  let touchId = null;
+  let centerX = 0;
+  let centerY = 0;
+  let lastDir = null;
+
+  function getCenter() {
+    const rect = base.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  }
+
+  function moveKnob(dx, dy) {
+    const dist  = Math.hypot(dx, dy);
+    const ratio = Math.min(dist, R) / (dist || 1);
+    const ox    = dx * ratio;
+    const oy    = dy * ratio;
+    knob.style.transform = `translate(calc(-50% + ${ox}px), calc(-50% + ${oy}px))`;
+
+    if (dist < DEAD) { lastDir = null; return; }
+
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;   // -180 .. 180
+    const dir =
+      angle > -45  && angle <=  45  ? 'RIGHT' :
+      angle >  45  && angle <= 135  ? 'DOWN'  :
+      angle > -135 && angle <= -45  ? 'UP'    : 'LEFT';
+
+    if (dir !== lastDir) {
+      lastDir = dir;
+      const player = getPlayerFn();
+      const snake  = player === 1 ? snake1 : snake2;
+      if (snake?.alive) pushDir(snake, dir);
+    }
+  }
+
+  function resetKnob() {
+    knob.style.transform = 'translate(-50%, -50%)';
+    lastDir = null;
+    touchId = null;
+  }
+
+  base.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (touchId !== null) return;
+    const t = e.changedTouches[0];
+    touchId = t.identifier;
+    const c = getCenter();
+    centerX = c.x; centerY = c.y;
+    moveKnob(t.clientX - centerX, t.clientY - centerY);
+  }, { passive: false });
+
+  base.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const t = [...e.changedTouches].find(tt => tt.identifier === touchId);
+    if (!t) return;
+    moveKnob(t.clientX - centerX, t.clientY - centerY);
+  }, { passive: false });
+
+  base.addEventListener('touchend', e => {
+    if ([...e.changedTouches].some(tt => tt.identifier === touchId)) resetKnob();
+  }, { passive: false });
+
+  base.addEventListener('touchcancel', () => resetKnob(), { passive: false });
+}
+
+// ─────────────────────────────────────────────
 // Boot
 // ─────────────────────────────────────────────
 setMode('pvc');
+setupJoystick('joy1-base', 'joy1-knob', () => 1);
+setupJoystick('joy2-base', 'joy2-knob', () => bottomJoyPlayer);
