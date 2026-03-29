@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>雙人貪食蛇</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0c1820;
+      color: #F3E3D0;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 2rem;
+      letter-spacing: 4px;
+      margin-bottom: 16px;
+      background: linear-gradient(90deg, #AACDDC, #F3E3D0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+
+    #menu {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .btn {
+      padding: 12px 28px;
+      border: 2px solid;
+      background: transparent;
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+
+    .btn-green {
+      border-color: #AACDDC;
+      color: #AACDDC;
+    }
+    .btn-green:hover, .btn-green.active {
+      background: #AACDDC;
+      color: #0c1820;
+    }
+
+    .btn-blue {
+      border-color: #81A6C6;
+      color: #81A6C6;
+    }
+    .btn-blue:hover, .btn-blue.active {
+      background: #81A6C6;
+      color: #0c1820;
+    }
+
+    .btn-orange {
+      border-color: #D2C4B4;
+      color: #D2C4B4;
+    }
+    .btn-orange:hover, .btn-orange.active {
+      background: #D2C4B4;
+      color: #0c1820;
+    }
+
+    .mode-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      max-width: 520px;
+    }
+
+    .controls-hint {
+      font-size: 0.75rem;
+      color: #81A6C6;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    #game-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #scoreboard {
+      display: flex;
+      gap: 48px;
+      font-size: 1rem;
+      letter-spacing: 2px;
+    }
+
+    .score-p1 { color: #AACDDC; }
+    .score-p2 { color: #D2C4B4; }
+
+    #canvas {
+      border: 2px solid #81A6C6;
+      display: block;
+      image-rendering: pixelated;
+      box-shadow: 0 0 24px rgba(129, 166, 198, 0.18);
+    }
+
+    #status {
+      font-size: 0.85rem;
+      color: #81A6C6;
+      letter-spacing: 1px;
+      height: 20px;
+    }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 24, 32, 0.92);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 10;
+    }
+
+    #overlay.visible { display: flex; }
+
+    #overlay h2 {
+      font-size: 2rem;
+      letter-spacing: 4px;
+      color: #F3E3D0;
+    }
+
+    #overlay p {
+      color: #81A6C6;
+      letter-spacing: 2px;
+    }
+
+    .speed-select {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #81A6C6;
+    }
+
+    .speed-select label { letter-spacing: 1px; }
+
+    select {
+      background: #152230;
+      color: #F3E3D0;
+      border: 1px solid #81A6C6;
+      padding: 4px 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+<div id="menu">
+  <h1>貪食蛇對戰</h1>
+
+  <div class="mode-buttons">
+    <button class="btn btn-green active" id="btn-pvp" onclick="setMode('pvp')">1P vs 2P</button>
+    <button class="btn btn-blue" id="btn-pvc" onclick="setMode('pvc')">1P vs 電腦</button>
+    <button class="btn btn-orange" id="btn-cvc" onclick="setMode('cvc')">電腦 vs 電腦</button>
+  </div>
+
+  <div class="speed-select">
+    <label>速度：</label>
+    <select id="speed-select">
+      <option value="150">慢速</option>
+      <option value="100" selected>正常</option>
+      <option value="65">快速</option>
+      <option value="40">瘋狂</option>
+    </select>
+  </div>
+
+  <button class="btn btn-green" onclick="startGame()">開始遊戲</button>
+
+  <div class="controls-hint" id="controls-hint">
+    <span style="color:#AACDDC">● 玩家1：WASD 移動</span><br>
+    <span style="color:#D2C4B4">● 玩家2：方向鍵 移動</span><br>
+    <br>
+    撞牆、撞自己或撞對方蛇身 → 扣分並重生<br>
+    搶先吃到食物 → 得分
+  </div>
+</div>
+
+<div id="game-container">
+  <div id="scoreboard">
+    <span class="score-p1" id="p1-label">P1: <span id="score1">0</span></span>
+    <span class="score-p2" id="p2-label">P2: <span id="score2">0</span></span>
+  </div>
+  <canvas id="canvas"></canvas>
+  <div id="status">按 ESC 返回主選單 | 按 P 暫停</div>
+</div>
+
+<div id="overlay">
+  <h2 id="overlay-title"></h2>
+  <p id="overlay-msg"></p>
+  <button class="btn btn-green" onclick="restartGame()">再玩一局</button>
+  <button class="btn btn-blue" onclick="backToMenu()">主選單</button>
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+// Constants & Config
+// ──────────────────────────────────────────────
+const CELL = 20;
+const COLS = 30;
+const ROWS = 25;
+const W = COLS * CELL;
+const H = ROWS * CELL;
+
+const DIR = { UP: [0,-1], DOWN: [0,1], LEFT: [-1,0], RIGHT: [1,0] };
+const OPPOSITE = {
+  UP: 'DOWN', DOWN: 'UP', LEFT: 'RIGHT', RIGHT: 'LEFT'
+};
+
+const COLORS = {
+  p1Head: '#AACDDC',
+  p1Body: '#81A6C6',
+  p1Dead: '#2a404e',
+  p2Head: '#F3E3D0',
+  p2Body: '#D2C4B4',
+  p2Dead: '#3d3228',
+  food: '#F3E3D0',
+  foodGlow: '#D2C4B4',
+  bg: '#0c1820',
+  grid: '#111e28',
+};
+
+// ──────────────────────────────────────────────
+// State
+// ──────────────────────────────────────────────
+let mode = 'pvp'; // 'pvp' | 'pvc' | 'cvc'
+let gameLoop = null;
+let paused = false;
+let gameOver = false;
+let tickInterval = 100;
+
+let snake1, snake2, foods;
+let score1, score2;
+let respawnTimer1, respawnTimer2;
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = W;
+canvas.height = H;
+
+// ──────────────────────────────────────────────
+// Menu helpers
+// ──────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-pvp').classList.toggle('active', m === 'pvp');
+  document.getElementById('btn-pvc').classList.toggle('active', m === 'pvc');
+  document.getElementById('btn-cvc').classList.toggle('active', m === 'cvc');
+  const hint = document.getElementById('controls-hint');
+  if (m === 'pvp') {
+    hint.innerHTML = `<span style="color:#AACDDC">● 玩家1：WASD 移動</span><br>
+      <span style="color:#D2C4B4">● 玩家2：方向鍵 移動</span><br><br>
+      撞牆、撞自己或撞對方蛇身 → 扣分並重生<br>搶先吃到食物 → 得分`;
+  } else if (m === 'pvc') {
+    hint.innerHTML = `<span style="color:#AACDDC">● 玩家1：WASD 移動</span><br>
+      <span style="color:#D2C4B4">● 電腦：自動追蹤食物</span><br><br>
+      撞牆、撞自己或撞對方蛇身 → 扣分並重生<br>搶先吃到食物 → 得分`;
+  } else {
+    hint.innerHTML = `<span style="color:#AACDDC">● CPU1：自動追蹤食物</span><br>
+      <span style="color:#D2C4B4">● CPU2：自動追蹤食物</span><br><br>
+      <span style="color:#F3E3D0">🤖 純觀戰模式，完全不需動手！</span><br>
+      撞牆、撞自己或撞對方蛇身 → 扣分並重生`;
+  }
+}
+
+function startGame() {
+  tickInterval = parseInt(document.getElementById('speed-select').value);
+  document.getElementById('menu').style.display = 'none';
+  document.getElementById('game-container').style.display = 'flex';
+
+  // Update scoreboard labels
+  if (mode === 'cvc') {
+    document.getElementById('p1-label').innerHTML = 'CPU1: <span id="score1">0</span>';
+    document.getElementById('p2-label').innerHTML = 'CPU2: <span id="score2">0</span>';
+    document.getElementById('status').textContent = '觀戰模式 ★ 按 P 暫停 | 按 ESC 返回主選單';
+  } else {
+    document.getElementById('p1-label').innerHTML = 'P1: <span id="score1">0</span>';
+    document.getElementById('p2-label').innerHTML =
+      (mode === 'pvc' ? 'CPU' : 'P2') + ': <span id="score2">0</span>';
+    document.getElementById('status').textContent = '按 ESC 返回主選單 | 按 P 暫停';
+  }
+  initGame();
+}
+
+function backToMenu() {
+  stopGame();
+  document.getElementById('overlay').classList.remove('visible');
+  document.getElementById('game-container').style.display = 'none';
+  document.getElementById('menu').style.display = 'flex';
+}
+
+function restartGame() {
+  document.getElementById('overlay').classList.remove('visible');
+  initGame();
+}
+
+// ──────────────────────────────────────────────
+// Snake factory
+// ──────────────────────────────────────────────
+function makeSnake(startX, startY, dir, id) {
+  return {
+    id,
+    body: [
+      [startX, startY],
+      [startX - DIR[dir][0], startY - DIR[dir][1]],
+      [startX - DIR[dir][0]*2, startY - DIR[dir][1]*2],
+    ],
+    dir,
+    nextDir: dir,
+    alive: true,
+    respawnIn: 0,
+    queuedDirs: [],
+  };
+}
+
+function initGame() {
+  score1 = 0;
+  score2 = 0;
+  gameOver = false;
+  paused = false;
+  updateScoreDisplay();
+
+  snake1 = makeSnake(7, 12, 'RIGHT', 1);
+  snake2 = makeSnake(22, 12, 'LEFT', 2);
+  foods = [];
+  spawnFood();
+  spawnFood();
+  spawnFood();
+
+  stopGame();
+  gameLoop = setInterval(tick, tickInterval);
+}
+
+function stopGame() {
+  if (gameLoop) { clearInterval(gameLoop); gameLoop = null; }
+}
+
+// ──────────────────────────────────────────────
+// Food
+// ──────────────────────────────────────────────
+function spawnFood() {
+  const occupied = new Set();
+  [...snake1.body, ...snake2.body].forEach(([x,y]) => occupied.add(`${x},${y}`));
+  foods.forEach(([x,y]) => occupied.add(`${x},${y}`));
+
+  let x, y, tries = 0;
+  do {
+    x = Math.floor(Math.random() * COLS);
+    y = Math.floor(Math.random() * ROWS);
+    tries++;
+  } while (occupied.has(`${x},${y}`) && tries < 200);
+
+  foods.push([x, y]);
+}
+
+// ──────────────────────────────────────────────
+// Input
+// ──────────────────────────────────────────────
+const KEY_MAP_1 = {
+  'KeyW': 'UP', 'KeyS': 'DOWN', 'KeyA': 'LEFT', 'KeyD': 'RIGHT'
+};
+const KEY_MAP_2 = {
+  'ArrowUp': 'UP', 'ArrowDown': 'DOWN', 'ArrowLeft': 'LEFT', 'ArrowRight': 'RIGHT'
+};
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Escape') { backToMenu(); return; }
+  if (e.code === 'KeyP') { paused = !paused; return; }
+
+  // cvc: no player input
+  if (mode === 'cvc') return;
+
+  if (KEY_MAP_1[e.code] && snake1.alive) {
+    const d = KEY_MAP_1[e.code];
+    const last = snake1.queuedDirs.length
+      ? snake1.queuedDirs[snake1.queuedDirs.length - 1]
+      : snake1.dir;
+    if (d !== OPPOSITE[last]) snake1.queuedDirs.push(d);
+    if (snake1.queuedDirs.length > 2) snake1.queuedDirs.shift();
+  }
+
+  if (mode === 'pvp' && KEY_MAP_2[e.code] && snake2.alive) {
+    e.preventDefault();
+    const d = KEY_MAP_2[e.code];
+    const last = snake2.queuedDirs.length
+      ? snake2.queuedDirs[snake2.queuedDirs.length - 1]
+      : snake2.dir;
+    if (d !== OPPOSITE[last]) snake2.queuedDirs.push(d);
+    if (snake2.queuedDirs.length > 2) snake2.queuedDirs.shift();
+  }
+});
+
+// ──────────────────────────────────────────────
+// AI
+// ──────────────────────────────────────────────
+function aiMove(snake, target) {
+  if (!snake.alive) return;
+
+  const [hx, hy] = snake.body[0];
+  const [tx, ty] = target;
+
+  // Candidate dirs ordered by Manhattan distance reduction
+  const candidates = ['UP','DOWN','LEFT','RIGHT']
+    .filter(d => d !== OPPOSITE[snake.dir])
+    .sort((a, b) => {
+      const [ax2, ay2] = [hx + DIR[a][0], hy + DIR[a][1]];
+      const [bx2, by2] = [hx + DIR[b][0], hy + DIR[b][1]];
+      const da = Math.abs(ax2 - tx) + Math.abs(ay2 - ty);
+      const db = Math.abs(bx2 - tx) + Math.abs(by2 - ty);
+      return da - db;
+    });
+
+  // Pick first safe candidate
+  const occupied = new Set([...snake1.body, ...snake2.body].map(([x,y]) => `${x},${y}`));
+
+  for (const d of candidates) {
+    const nx = hx + DIR[d][0];
+    const ny = hy + DIR[d][1];
+    if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) continue;
+    // Allow head cell (it will move away), avoid body except tail
+    const bodyKey = `${nx},${ny}`;
+    const bodyArr = [...snake1.body, ...snake2.body];
+    // tail will move, so it's safe
+    const tailKey1 = `${snake1.body[snake1.body.length-1][0]},${snake1.body[snake1.body.length-1][1]}`;
+    const tailKey2 = `${snake2.body[snake2.body.length-1][0]},${snake2.body[snake2.body.length-1][1]}`;
+    if (occupied.has(bodyKey) && bodyKey !== tailKey1 && bodyKey !== tailKey2) continue;
+    snake.queuedDirs.push(d);
+    return;
+  }
+
+  // Fallback: any valid direction
+  for (const d of ['UP','DOWN','LEFT','RIGHT']) {
+    if (d === OPPOSITE[snake.dir]) continue;
+    const nx = hx + DIR[d][0];
+    const ny = hy + DIR[d][1];
+    if (nx >= 0 && ny >= 0 && nx < COLS && ny < ROWS) {
+      snake.queuedDirs.push(d);
+      return;
+    }
+  }
+}
+
+function nearestFood(snake) {
+  const [hx, hy] = snake.body[0];
+  let best = null, bestDist = Infinity;
+  for (const f of foods) {
+    const d = Math.abs(f[0] - hx) + Math.abs(f[1] - hy);
+    if (d < bestDist) { bestDist = d; best = f; }
+  }
+  return best;
+}
+
+// cvc: CPU1 tries to target the food that CPU2 is NOT targeting
+// to create competitive behavior — they spread out across different foods
+function nearestFoodExcluding(snake, rival) {
+  if (foods.length <= 1) return nearestFood(snake);
+  const [hx, hy] = snake.body[0];
+  const [rx, ry] = rival.body[0];
+  // Find the food closest to rival
+  let rivalTarget = null, rivalDist = Infinity;
+  for (const f of foods) {
+    const d = Math.abs(f[0] - rx) + Math.abs(f[1] - ry);
+    if (d < rivalDist) { rivalDist = d; rivalTarget = f; }
+  }
+  // Find best food for snake that isn't the rival's target
+  let best = null, bestDist = Infinity;
+  for (const f of foods) {
+    if (f === rivalTarget) continue;
+    const d = Math.abs(f[0] - hx) + Math.abs(f[1] - hy);
+    if (d < bestDist) { bestDist = d; best = f; }
+  }
+  return best || nearestFood(snake);
+}
+
+// ──────────────────────────────────────────────
+// Tick
+// ──────────────────────────────────────────────
+function tick() {
+  if (paused || gameOver) { draw(); return; }
+
+  // Respawn countdowns
+  if (!snake1.alive) {
+    snake1.respawnIn--;
+    if (snake1.respawnIn <= 0) respawnSnake(snake1, 7, 12, 'RIGHT');
+  }
+  if (!snake2.alive) {
+    snake2.respawnIn--;
+    if (snake2.respawnIn <= 0) respawnSnake(snake2, 22, 12, 'LEFT');
+  }
+
+  // AI chooses direction
+  if ((mode === 'pvc' || mode === 'cvc') && snake2.alive) {
+    const target = nearestFood(snake2);
+    if (target) aiMove(snake2, target);
+  }
+  if (mode === 'cvc' && snake1.alive) {
+    // CPU1 targets a different food from CPU2 when possible
+    const target = nearestFoodExcluding(snake1, snake2);
+    if (target) aiMove(snake1, target);
+  }
+
+  moveSnake(snake1);
+  moveSnake(snake2);
+
+  // Collision detection
+  checkCollision(snake1, snake2);
+  checkCollision(snake2, snake1);
+
+  // Food eating
+  checkFood(snake1, 1);
+  checkFood(snake2, 2);
+
+  // Keep food count at 3
+  while (foods.length < 3) spawnFood();
+
+  updateScoreDisplay();
+  draw();
+}
+
+function respawnSnake(snake, x, y, dir) {
+  snake.body = [
+    [x, y],
+    [x - DIR[dir][0], y - DIR[dir][1]],
+    [x - DIR[dir][0]*2, y - DIR[dir][1]*2],
+  ];
+  snake.dir = dir;
+  snake.nextDir = dir;
+  snake.queuedDirs = [];
+  snake.alive = true;
+}
+
+function moveSnake(snake) {
+  if (!snake.alive) return;
+
+  // Apply queued direction
+  if (snake.queuedDirs.length > 0) {
+    const next = snake.queuedDirs.shift();
+    if (next !== OPPOSITE[snake.dir]) snake.dir = next;
+  }
+
+  const [hx, hy] = snake.body[0];
+  const [dx, dy] = DIR[snake.dir];
+  snake.body.unshift([hx + dx, hy + dy]);
+  snake.body.pop();
+}
+
+function checkCollision(snake, other) {
+  if (!snake.alive) return;
+  const [hx, hy] = snake.body[0];
+
+  // Wall
+  if (hx < 0 || hy < 0 || hx >= COLS || hy >= ROWS) {
+    killSnake(snake);
+    return;
+  }
+
+  // Self collision (skip head)
+  for (let i = 1; i < snake.body.length; i++) {
+    if (snake.body[i][0] === hx && snake.body[i][1] === hy) {
+      killSnake(snake);
+      return;
+    }
+  }
+
+  // Other snake body
+  if (other.alive) {
+    for (const [x, y] of other.body) {
+      if (x === hx && y === hy) {
+        killSnake(snake);
+        return;
+      }
+    }
+  }
+}
+
+function killSnake(snake) {
+  snake.alive = false;
+  snake.respawnIn = 25; // ~2.5 seconds at 100ms tick
+  if (snake.id === 1) {
+    score1 = Math.max(0, score1 - 1);
+  } else {
+    score2 = Math.max(0, score2 - 1);
+  }
+}
+
+function checkFood(snake, playerNum) {
+  if (!snake.alive) return;
+  const [hx, hy] = snake.body[0];
+  for (let i = foods.length - 1; i >= 0; i--) {
+    if (foods[i][0] === hx && foods[i][1] === hy) {
+      foods.splice(i, 1);
+      // Grow snake
+      const tail = snake.body[snake.body.length - 1];
+      snake.body.push([...tail]);
+      if (playerNum === 1) score1++;
+      else score2++;
+    }
+  }
+}
+
+function updateScoreDisplay() {
+  document.getElementById('score1').textContent = score1;
+  document.getElementById('score2').textContent = score2;
+}
+
+// ──────────────────────────────────────────────
+// Draw
+// ──────────────────────────────────────────────
+function draw() {
+  // Background
+  ctx.fillStyle = COLORS.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = COLORS.grid;
+  ctx.lineWidth = 0.5;
+  for (let x = 0; x <= COLS; x++) {
+    ctx.beginPath(); ctx.moveTo(x*CELL, 0); ctx.lineTo(x*CELL, H); ctx.stroke();
+  }
+  for (let y = 0; y <= ROWS; y++) {
+    ctx.beginPath(); ctx.moveTo(0, y*CELL); ctx.lineTo(W, y*CELL); ctx.stroke();
+  }
+
+  // Foods
+  for (const [fx, fy] of foods) {
+    const cx = fx * CELL + CELL/2;
+    const cy = fy * CELL + CELL/2;
+    // Glow
+    const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, CELL);
+    grad.addColorStop(0, 'rgba(243,227,208,0.55)');
+    grad.addColorStop(1, 'rgba(210,196,180,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, CELL, 0, Math.PI*2);
+    ctx.fill();
+    // Food circle
+    ctx.fillStyle = COLORS.food;
+    ctx.beginPath();
+    ctx.arc(cx, cy, CELL/2 - 2, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  // Draw snakes
+  drawSnake(snake1, COLORS.p1Head, COLORS.p1Body, COLORS.p1Dead);
+  drawSnake(snake2, COLORS.p2Head, COLORS.p2Body, COLORS.p2Dead);
+
+  // Pause overlay
+  if (paused) {
+    ctx.fillStyle = 'rgba(12,24,32,0.75)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#F3E3D0';
+    ctx.font = 'bold 36px Courier New';
+    ctx.textAlign = 'center';
+    ctx.fillText('PAUSED', W/2, H/2);
+    ctx.font = '16px Courier New';
+    ctx.fillStyle = '#81A6C6';
+    ctx.fillText('按 P 繼續', W/2, H/2 + 36);
+    ctx.textAlign = 'left';
+  }
+
+  // Respawn countdowns
+  const label1 = mode === 'cvc' ? 'CPU1' : 'P1';
+  const label2 = mode === 'pvp' ? 'P2' : (mode === 'cvc' ? 'CPU2' : 'CPU');
+  if (!snake1.alive) drawRespawn(snake1, '#AACDDC', label1);
+  if (!snake2.alive) drawRespawn(snake2, '#D2C4B4', label2);
+}
+
+function drawSnake(snake, headColor, bodyColor, deadColor) {
+  if (snake.body.length === 0) return;
+
+  const alive = snake.alive;
+
+  for (let i = snake.body.length - 1; i >= 0; i--) {
+    const [x, y] = snake.body[i];
+    const isHead = i === 0;
+
+    if (isHead) {
+      ctx.fillStyle = alive ? headColor : deadColor;
+    } else {
+      const ratio = 1 - (i / snake.body.length) * 0.4;
+      ctx.fillStyle = alive ? shadeColor(bodyColor, ratio) : deadColor;
+    }
+
+    const pad = isHead ? 1 : 2;
+    const r = isHead ? 4 : 3;
+    roundRect(ctx, x * CELL + pad, y * CELL + pad, CELL - pad*2, CELL - pad*2, r);
+    ctx.fill();
+
+    // Eyes on head
+    if (isHead && alive) {
+      ctx.fillStyle = '#000';
+      const [dx, dy] = DIR[snake.dir];
+      // Eye offset perpendicular to direction
+      const ex = dy !== 0 ? 5 : (dx > 0 ? CELL - 6 : 5);
+      const ey = dx !== 0 ? 5 : (dy > 0 ? CELL - 6 : 5);
+      // Two eyes
+      const offsets = dx !== 0
+        ? [[ex, 4], [ex, CELL-7]]
+        : [[4, ey], [CELL-7, ey]];
+      for (const [ox, oy] of offsets) {
+        ctx.beginPath();
+        ctx.arc(x*CELL + ox + 1, y*CELL + oy + 1, 2, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+  }
+}
+
+function drawRespawn(snake, color, label) {
+  const secs = (snake.respawnIn / 10).toFixed(1);
+  ctx.fillStyle = color + '33';
+  ctx.fillRect(0, 0, W, H);
+
+  // Find a spot near center to show timer
+  const x = snake.id === 1 ? W*0.25 : W*0.75;
+  const y = H/2;
+
+  ctx.fillStyle = color;
+  ctx.font = 'bold 20px Courier New';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${label} 重生中...`, x, y - 16);
+  ctx.font = '14px Courier New';
+  ctx.fillStyle = '#aaa';
+  ctx.fillText(`${secs}s`, x, y + 10);
+  ctx.textAlign = 'left';
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function shadeColor(hex, ratio) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r*ratio)},${Math.round(g*ratio)},${Math.round(b*ratio)})`;
+}
+
+// ──────────────────────────────────────────────
+// Init draw on load
+// ──────────────────────────────────────────────
+setMode('pvp');
+</script>
+</body>
+</html>
