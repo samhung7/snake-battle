@@ -1,0 +1,421 @@
+/* ═══════════════════════════════════════════
+   CSS Custom Properties — Dark (default)
+═══════════════════════════════════════════ */
+:root {
+  --bg:             #0d1922;
+  --text:           #E6D8C6;
+  --text-muted:     #7898B4;
+  --border:         #5A8AA8;
+  --canvas-border:  #5A8AA8;
+  --canvas-glow:    rgba(90,138,168,0.15);
+  --select-bg:      #14202E;
+  --icon-bg:        rgba(90,138,168,0.10);
+  --icon-border:    rgba(90,138,168,0.38);
+
+  /* gradient title */
+  --grad-a:         #A8D0E2;
+  --grad-b:         #EAD6BC;
+
+  /* scores / inline colour hints */
+  --c-p1:           #A8D0E2;
+  --c-p2:           #EAD6BC;
+  --c-accent:       #E6D8C6;
+
+  /* mode & CTA buttons */
+  --btn1-c:   #A8D0E2;  --btn1-bg: #A8D0E2;  --btn1-fg: #0d1922;
+  --btn2-c:   #78A8C6;  --btn2-bg: #78A8C6;  --btn2-fg: #0d1922;
+  --btn3-c:   #C4AC98;  --btn3-bg: #C4AC98;  --btn3-fg: #0d1922;
+
+  /* D-pad P1 */
+  --d1c:  #A8D0E2;
+  --d1b:  rgba(168,208,226,0.42);
+  --d1bg: rgba(168,208,226,0.08);
+  --d1a:  rgba(168,208,226,0.26);
+
+  /* D-pad P2 */
+  --d2c:  #EAD6BC;
+  --d2b:  rgba(234,214,188,0.42);
+  --d2bg: rgba(234,214,188,0.08);
+  --d2a:  rgba(234,214,188,0.26);
+}
+
+/* ═══════════════════════════════════════════
+   Light theme overrides
+═══════════════════════════════════════════ */
+body.light {
+  --bg:             #EDE5D2;
+  --text:           #18303E;
+  --text-muted:     #3E5E72;
+  --border:         #3A6080;
+  --canvas-border:  #3A6080;
+  --canvas-glow:    rgba(58,96,128,0.13);
+  --select-bg:      #D2C8B2;
+  --icon-bg:        rgba(58,96,128,0.08);
+  --icon-border:    rgba(58,96,128,0.32);
+
+  --grad-a:         #1A5472;
+  --grad-b:         #6A3618;
+
+  --c-p1:           #1A5472;
+  --c-p2:           #6A3618;
+  --c-accent:       #18303E;
+
+  --btn1-c:   #1A5472;  --btn1-bg: #1A5472;  --btn1-fg: #EDE5D2;
+  --btn2-c:   #286A8C;  --btn2-bg: #286A8C;  --btn2-fg: #EDE5D2;
+  --btn3-c:   #6A3618;  --btn3-bg: #6A3618;  --btn3-fg: #EDE5D2;
+
+  --d1c:  #1A5472;
+  --d1b:  rgba(26,84,114,0.38);
+  --d1bg: rgba(26,84,114,0.07);
+  --d1a:  rgba(26,84,114,0.20);
+
+  --d2c:  #6A3618;
+  --d2b:  rgba(106,54,24,0.38);
+  --d2bg: rgba(106,54,24,0.07);
+  --d2a:  rgba(106,54,24,0.20);
+}
+
+/* ═══════════════════════════════════════════
+   Base
+═══════════════════════════════════════════ */
+*, *::before, *::after {
+  margin: 0; padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  transition: background 0.25s, color 0.25s;
+}
+
+/* ═══════════════════════════════════════════
+   Utility
+═══════════════════════════════════════════ */
+.hidden { display: none !important; }
+
+.c-p1     { color: var(--c-p1); }
+.c-p2     { color: var(--c-p2); }
+.c-accent { color: var(--c-accent); }
+
+/* ═══════════════════════════════════════════
+   Buttons — mode / CTA
+═══════════════════════════════════════════ */
+.btn {
+  padding: 10px 20px;
+  border: 2px solid;
+  background: transparent;
+  font-family: inherit;
+  font-size: clamp(0.70rem, 2.8vw, 0.92rem);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-1 { border-color: var(--btn1-c); color: var(--btn1-c); }
+.btn-1:hover, .btn-1.active { background: var(--btn1-bg); color: var(--btn1-fg); }
+
+.btn-2 { border-color: var(--btn2-c); color: var(--btn2-c); }
+.btn-2:hover, .btn-2.active { background: var(--btn2-bg); color: var(--btn2-fg); }
+
+.btn-3 { border-color: var(--btn3-c); color: var(--btn3-c); }
+.btn-3:hover, .btn-3.active { background: var(--btn3-bg); color: var(--btn3-fg); }
+
+/* ═══════════════════════════════════════════
+   Icon buttons (pause / back / theme)
+═══════════════════════════════════════════ */
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1.5px solid var(--icon-border);
+  background: var(--icon-bg);
+  color: var(--text-muted);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+
+.icon-btn:hover, .icon-btn:active {
+  background: var(--icon-border);
+  color: var(--text);
+}
+
+/* ═══════════════════════════════════════════
+   Menu screen
+═══════════════════════════════════════════ */
+#menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 16px;
+  max-height: 100dvh;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 480px;
+}
+
+#menu-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  position: relative;
+}
+
+#menu-topbar .icon-btn {
+  position: absolute;
+  right: 0;
+}
+
+h1 {
+  font-size: clamp(1.1rem, 5vw, 2rem);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, var(--grad-a), var(--grad-b));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.speed-select {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: clamp(0.70rem, 2.8vw, 0.84rem);
+  color: var(--text-muted);
+}
+
+.speed-select label { letter-spacing: 1px; }
+
+select {
+  background: var(--select-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: clamp(0.70rem, 2.8vw, 0.84rem);
+  touch-action: manipulation;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+
+.controls-hint {
+  font-size: clamp(0.60rem, 2.3vw, 0.74rem);
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.9;
+}
+
+/* ═══════════════════════════════════════════
+   Game screen
+═══════════════════════════════════════════ */
+#game-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0;
+}
+
+/* Top bar: scoreboard + action buttons */
+#game-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 12px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+#scoreboard {
+  display: flex;
+  gap: 24px;
+  font-size: clamp(0.76rem, 3.2vw, 0.98rem);
+  letter-spacing: 2px;
+}
+
+.score-p1 { color: var(--c-p1); }
+.score-p2 { color: var(--c-p2); }
+
+#game-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#canvas {
+  border: 2px solid var(--canvas-border);
+  display: block;
+  touch-action: none;
+  box-shadow: 0 0 28px var(--canvas-glow);
+  flex-shrink: 0;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+#status {
+  font-size: clamp(0.58rem, 2.0vw, 0.78rem);
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-align: center;
+  padding: 4px 0;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════
+   D-pad zones
+═══════════════════════════════════════════ */
+.dpad-zone {
+  display: none;    /* shown via pointer:coarse */
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 5px 0 6px;
+  flex-shrink: 0;
+}
+
+.dpad-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.dpad-label {
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+/* 3×3 grid, only 4 directional cells + centre filled */
+.dpad {
+  --btn: 44px;
+  display: grid;
+  grid-template-areas:
+    ". up ."
+    "left mid right"
+    ". down .";
+  grid-template-columns: repeat(3, var(--btn));
+  grid-template-rows:    repeat(3, var(--btn));
+  gap: 4px;
+}
+
+.dpad-btn {
+  width:  var(--btn);
+  height: var(--btn);
+  border-radius: 8px;
+  border: 1.5px solid var(--d1b);
+  background: var(--d1bg);
+  color: var(--d1c);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  cursor: pointer;
+  transition: background 0.07s;
+}
+
+.dpad-btn:active, .dpad-btn.pressed { background: var(--d1a); }
+
+/* P2 variant */
+.dpad-btn.p2 {
+  border-color: var(--d2b);
+  background:   var(--d2bg);
+  color:        var(--d2c);
+}
+.dpad-btn.p2:active, .dpad-btn.p2.pressed { background: var(--d2a); }
+
+/* Grid area assignments */
+.d-up    { grid-area: up;    }
+.d-down  { grid-area: down;  }
+.d-left  { grid-area: left;  }
+.d-right { grid-area: right; }
+
+.dpad-mid {
+  grid-area: mid;
+  width:  var(--btn);
+  height: var(--btn);
+  border-radius: 50%;
+  border: 1.5px solid var(--d1b);
+  opacity: 0.4;
+}
+.dpad-mid.p2 { border-color: var(--d2b); }
+
+/* ═══════════════════════════════════════════
+   Overlay (game over / pause screen)
+═══════════════════════════════════════════ */
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13,25,34,0.92);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  z-index: 10;
+  padding: 16px;
+  transition: background 0.25s;
+}
+
+body.light #overlay { background: rgba(237,229,210,0.94); }
+
+#overlay.visible { display: flex; }
+
+#overlay h2 {
+  font-size: clamp(1.2rem, 5vw, 2rem);
+  letter-spacing: 4px;
+  color: var(--text);
+  text-align: center;
+}
+
+#overlay p {
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  font-size: clamp(0.70rem, 2.8vw, 0.92rem);
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════
+   Touch device: show D-pads
+═══════════════════════════════════════════ */
+@media (pointer: coarse) {
+  .dpad-zone { display: flex; }
+  #status    { display: none; }
+}
+
+/* Extra-small phones */
+@media (max-width: 360px) {
+  .dpad { --btn: 40px; }
+  .btn  { padding: 8px 12px; }
+}
