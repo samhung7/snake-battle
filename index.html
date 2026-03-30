@@ -3,22 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>貪食蛇對戰</title>
 
-  <!-- Favicon — SVG (snake emoji, modern browsers) -->
+  <!-- ── 基本 SEO ── -->
+  <title>貪食蛇對戰 | Snake Battle – 免費雙人瀏覽器遊戲</title>
+  <meta name="description" content="免費雙人貪食蛇對戰遊戲！支援 1P vs 2P、1P vs AI、AI vs AI，可調速度、穿牆模式、食物數量，支援繁中、简中、English、日本語、한국어。">
+  <meta name="keywords" content="貪食蛇, snake game, 雙人遊戲, snake battle, 貪食蛇對戰, browser game, 免費遊戲">
+  <link rel="canonical" href="https://samhung7.github.io/snake-battle/">
+
+  <!-- ── Open Graph（社群分享預覽：LINE、Facebook 等）── -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="貪食蛇對戰 | Snake Battle">
+  <meta property="og:description" content="免費雙人貪食蛇對戰遊戲，支援多語言、多模式，直接在瀏覽器玩！">
+  <meta property="og:url" content="https://samhung7.github.io/snake-battle/">
+  <meta property="og:image" content="https://samhung7.github.io/snake-battle/preview.png">
+  <meta property="og:locale" content="zh_TW">
+
+  <!-- ── Twitter Card ── -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="貪食蛇對戰 | Snake Battle">
+  <meta name="twitter:description" content="免費雙人貪食蛇對戰遊戲，支援多語言、多模式！">
+  <meta name="twitter:image" content="https://samhung7.github.io/snake-battle/preview.png">
+
+  <!-- ── 結構化資料（Schema.org VideoGame）── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "貪食蛇對戰",
+    "alternateName": "Snake Battle",
+    "description": "雙人貪食蛇對戰遊戲，支援多語言、多模式，免費在瀏覽器遊玩",
+    "url": "https://samhung7.github.io/snake-battle/",
+    "playMode": ["SinglePlayer", "MultiPlayer"],
+    "gamePlatform": "Web Browser",
+    "inLanguage": ["zh-TW", "zh-CN", "en", "ja", "ko"],
+    "isAccessibleForFree": true,
+    "applicationCategory": "Game"
+  }
+  </script>
+
+  <!-- ── Favicon & PWA ── -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐍</text></svg>">
-
-  <!-- iOS / iPadOS home-screen icon -->
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-
-  <!-- PWA: standalone app behaviour -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Snake">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#1A5472">
-
-  <!-- PWA manifest (Android Chrome "Add to Home Screen") -->
   <link rel="manifest" href="manifest.json">
 
   <link rel="stylesheet" href="css/style.css">
