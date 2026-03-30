@@ -655,56 +655,138 @@ document.getElementById('back-btn').addEventListener('touchstart', e => {
 }, { passive: false });
 
 // ─────────────────────────────────────────────
-// AI
+// AI — distance & movement helpers
 // ─────────────────────────────────────────────
-function aiMove(snake, target) {
-  if (!snake.alive || !target) return;
-  const [hx, hy] = snake.body[0];
-  const [tx, ty] = target;
 
-  const cands = ['UP', 'DOWN', 'LEFT', 'RIGHT']
-    .filter(d => d !== OPPOSITE[snake.dir])
-    .sort((a, b) => {
-      const da = Math.abs(hx + DIR[a][0] - tx) + Math.abs(hy + DIR[a][1] - ty);
-      const db = Math.abs(hx + DIR[b][0] - tx) + Math.abs(hy + DIR[b][1] - ty);
-      return da - db;
-    });
-
-  const occ   = new Set([...snake1.body, ...snake2.body].map(([x, y]) => `${x},${y}`));
-  const tail1 = `${snake1.body.at(-1)[0]},${snake1.body.at(-1)[1]}`;
-  const tail2 = `${snake2.body.at(-1)[0]},${snake2.body.at(-1)[1]}`;
-
-  for (const d of cands) {
-    const nx = hx + DIR[d][0], ny = hy + DIR[d][1];
-    if (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS) continue;
-    const k = `${nx},${ny}`;
-    if (occ.has(k) && k !== tail1 && k !== tail2) continue;
-    snake.queuedDirs.push(d);
-    return;
-  }
-  for (const d of cands) {
-    const nx = hx + DIR[d][0], ny = hy + DIR[d][1];
-    if (nx >= 0 && ny >= 0 && nx < COLS && ny < ROWS) { snake.queuedDirs.push(d); return; }
-  }
+/**
+ * Wrapped Manhattan distance.
+ * When wallWrap is on the board is toroidal, so the shortest path
+ * may go through a wall — this accounts for that.
+ */
+function wDist(ax, ay, bx, by) {
+  const dx = wallWrap
+    ? Math.min(Math.abs(ax - bx), COLS - Math.abs(ax - bx))
+    : Math.abs(ax - bx);
+  const dy = wallWrap
+    ? Math.min(Math.abs(ay - by), ROWS - Math.abs(ay - by))
+    : Math.abs(ay - by);
+  return dx + dy;
 }
 
+/** One step in direction d from (x, y), wrapping if wallWrap is on. */
+function wStep(x, y, d) {
+  let nx = x + DIR[d][0], ny = y + DIR[d][1];
+  if (wallWrap) { nx = (nx + COLS) % COLS; ny = (ny + ROWS) % ROWS; }
+  return [nx, ny];
+}
+
+/** Nearest food to snake, using wrapped distance. */
 function nearestFood(snake) {
   const [hx, hy] = snake.body[0];
   return foods.reduce((b, f) => {
-    const d = Math.abs(f[0] - hx) + Math.abs(f[1] - hy);
-    return !b || d < Math.abs(b[0] - hx) + Math.abs(b[1] - hy) ? f : b;
+    const d = wDist(f[0], f[1], hx, hy);
+    return !b || d < wDist(b[0], b[1], hx, hy) ? f : b;
   }, null);
 }
 
+/** Nearest food excluding the one the rival is already targeting. */
 function nearestFoodExcluding(snake, rival) {
   if (foods.length <= 1) return nearestFood(snake);
   const [hx, hy] = snake.body[0];
   const rivalTarget = nearestFood(rival);
   const pool = foods.filter(f => f !== rivalTarget);
   return (pool.length ? pool : foods).reduce((b, f) => {
-    const d = Math.abs(f[0] - hx) + Math.abs(f[1] - hy);
-    return !b || d < Math.abs(b[0] - hx) + Math.abs(b[1] - hy) ? f : b;
+    const d = wDist(f[0], f[1], hx, hy);
+    return !b || d < wDist(b[0], b[1], hx, hy) ? f : b;
   }, null);
+}
+
+/**
+ * Predict the rival's next `steps` positions (greedy toward nearest food).
+ * Returns a Set of "x,y" key strings the rival is likely to pass through.
+ */
+function rivalLookahead(rival, steps) {
+  if (!rival.alive || !foods.length) return new Set();
+  let [rx, ry] = rival.body[0];
+  let dir = rival.dir;
+  const ahead = new Set();
+  for (let i = 0; i < steps; i++) {
+    // Pick direction minimising wrapped distance to nearest food
+    const best = ['UP', 'DOWN', 'LEFT', 'RIGHT']
+      .filter(d => d !== OPPOSITE[dir])
+      .sort((a, b) => {
+        const [nxa, nya] = wStep(rx, ry, a);
+        const [nxb, nyb] = wStep(rx, ry, b);
+        const fa = foods.reduce((mn, f) => Math.min(mn, wDist(nxa, nya, f[0], f[1])), Infinity);
+        const fb = foods.reduce((mn, f) => Math.min(mn, wDist(nxb, nyb, f[0], f[1])), Infinity);
+        return fa - fb;
+      })[0];
+    if (!best) break;
+    [rx, ry] = wStep(rx, ry, best);
+    dir = best;
+    ahead.add(`${rx},${ry}`);
+  }
+  return ahead;
+}
+
+// ─────────────────────────────────────────────
+// AI — main move decision
+// ─────────────────────────────────────────────
+function aiMove(snake, target) {
+  if (!snake.alive || !target) return;
+  const [hx, hy] = snake.body[0];
+  const rival     = snake === snake1 ? snake2 : snake1;
+
+  const occ   = new Set([...snake1.body, ...snake2.body].map(([x, y]) => `${x},${y}`));
+  const tail1 = `${snake1.body.at(-1)[0]},${snake1.body.at(-1)[1]}`;
+  const tail2 = `${snake2.body.at(-1)[0]},${snake2.body.at(-1)[1]}`;
+
+  // Rival's predicted path for the next 4 ticks
+  const rivalAhead = rivalLookahead(rival, 4);
+
+  // Rival's nearest food and how far they are from it
+  const rivalFoodTarget = rival.alive ? nearestFood(rival) : null;
+  const [rx, ry]        = rival.alive ? rival.body[0] : [-1, -1];
+  const rivalToFood     = rivalFoodTarget
+    ? wDist(rx, ry, rivalFoodTarget[0], rivalFoodTarget[1])
+    : Infinity;
+
+  const scored = ['UP', 'DOWN', 'LEFT', 'RIGHT']
+    .filter(d => d !== OPPOSITE[snake.dir])
+    .map(d => {
+      const [nx, ny] = wStep(hx, hy, d);
+      if (!wallWrap && (nx < 0 || ny < 0 || nx >= COLS || ny >= ROWS)) return null;
+      const k = `${nx},${ny}`;
+      if (occ.has(k) && k !== tail1 && k !== tail2) return null;
+
+      // Base score: wrapped distance to own food target (lower = better)
+      let score = wDist(nx, ny, target[0], target[1]) * 10;
+
+      // Block bonus: stepping onto the rival's predicted path cuts them off
+      if (rivalAhead.has(k)) score -= 25;
+
+      // Cut-off bonus: heading to the rival's food faster than they can —
+      // steals the food AND forces them to reroute through our body
+      if (rivalFoodTarget) {
+        const myToRivalFood = wDist(nx, ny, rivalFoodTarget[0], rivalFoodTarget[1]);
+        if (myToRivalFood < rivalToFood) score -= 8;
+      }
+
+      return { d, score };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.score - b.score);
+
+  if (scored.length) { snake.queuedDirs.push(scored[0].d); return; }
+
+  // Fallback: any direction that avoids immediate wall collision
+  for (const d of ['UP', 'DOWN', 'LEFT', 'RIGHT']) {
+    if (d === OPPOSITE[snake.dir]) continue;
+    const [nx, ny] = wStep(hx, hy, d);
+    if (wallWrap || (nx >= 0 && ny >= 0 && nx < COLS && ny < ROWS)) {
+      snake.queuedDirs.push(d); return;
+    }
+  }
 }
 
 // ─────────────────────────────────────────────
