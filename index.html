@@ -113,7 +113,7 @@
   <div class="menu-option-row">
     <span class="menu-option-label" data-i18n="foodLabel">食物數量</span>
     <div class="counter">
-      <button class="counter-btn" id="food-minus" onclick="adjustFood(-1)" disabled>−</button>
+      <button class="counter-btn" id="food-minus" onclick="adjustFood(-1)">−</button>
       <span   class="counter-val" id="food-count-display">3</span>
       <button class="counter-btn" id="food-plus"  onclick="adjustFood(1)">＋</button>
     </div>
@@ -158,10 +158,10 @@
     </div>
   </div>
 
-  <!-- ── Top touchpad: P1 (pvp touch only) ── -->
+  <!-- ── Top touchpad: P2 (pvp touch only) ── -->
   <div id="dpad-top" class="dpad-zone hidden">
     <div class="touchpad-wrap">
-      <div class="touchpad" id="touchpad1"></div>
+      <div class="touchpad p2" id="touchpad2"></div>
     </div>
   </div>
 
@@ -169,10 +169,10 @@
   <canvas id="canvas"></canvas>
   <div id="status"></div>
 
-  <!-- ── Bottom touchpad: P2 (pvp touch only) ── -->
+  <!-- ── Bottom touchpad: P1 (pvp touch only) ── -->
   <div id="dpad-bottom" class="dpad-zone hidden">
     <div class="touchpad-wrap">
-      <div class="touchpad p2" id="touchpad2"></div>
+      <div class="touchpad" id="touchpad1"></div>
     </div>
   </div>
 
