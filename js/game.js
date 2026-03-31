@@ -99,8 +99,8 @@ const I18N = {
     p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
     rotateHint: '請旋轉手機為直向',
     hintPvpTouch:
-      `<span class="c-p1">● 玩家1：上方觸控板滑動</span><br>
-       <span class="c-p2">● 玩家2：下方觸控板滑動</span><br><br>
+      `<span class="c-p1">● 玩家1：下方觸控板滑動</span><br>
+       <span class="c-p2">● 玩家2：上方觸控板滑動</span><br><br>
        撞牆或對方 → 扣分並重生　搶食物 → 得分`,
     hintPvpKey:
       `<span class="c-p1">● 玩家1：WASD 移動</span><br>
@@ -147,8 +147,8 @@ const I18N = {
     p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
     rotateHint: 'Please rotate to portrait',
     hintPvpTouch:
-      `<span class="c-p1">● P1: Swipe on top pad</span><br>
-       <span class="c-p2">● P2: Swipe on bottom pad</span><br><br>
+      `<span class="c-p1">● P1: Swipe on bottom pad</span><br>
+       <span class="c-p2">● P2: Swipe on top pad</span><br><br>
        Hit wall or opponent → lose point &amp; respawn<br>Eat food first → gain point`,
     hintPvpKey:
       `<span class="c-p1">● P1: WASD keys</span><br>
@@ -195,8 +195,8 @@ const I18N = {
     p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
     rotateHint: '縦向きに回転してください',
     hintPvpTouch:
-      `<span class="c-p1">● P1：上のタッチパッドをスワイプ</span><br>
-       <span class="c-p2">● P2：下のタッチパッドをスワイプ</span><br><br>
+      `<span class="c-p1">● P1：下のタッチパッドをスワイプ</span><br>
+       <span class="c-p2">● P2：上のタッチパッドをスワイプ</span><br><br>
        壁・相手に当たる → 減点して復活　エサを先取り → 得点`,
     hintPvpKey:
       `<span class="c-p1">● P1：WASD キー</span><br>
@@ -243,8 +243,8 @@ const I18N = {
     p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
     rotateHint: '세로 방향으로 회전해 주세요',
     hintPvpTouch:
-      `<span class="c-p1">● P1: 위 터치패드 스와이프</span><br>
-       <span class="c-p2">● P2: 아래 터치패드 스와이프</span><br><br>
+      `<span class="c-p1">● P1: 아래 터치패드 스와이프</span><br>
+       <span class="c-p2">● P2: 위 터치패드 스와이프</span><br><br>
        벽·상대에 충돌 → 감점 후 부활　음식 먹기 → 득점`,
     hintPvpKey:
       `<span class="c-p1">● P1: WASD 키</span><br>
@@ -291,8 +291,8 @@ const I18N = {
     p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
     rotateHint: '请旋转手机为竖向',
     hintPvpTouch:
-      `<span class="c-p1">● 玩家1：上方触控板滑动</span><br>
-       <span class="c-p2">● 玩家2：下方触控板滑动</span><br><br>
+      `<span class="c-p1">● 玩家1：下方触控板滑动</span><br>
+       <span class="c-p2">● 玩家2：上方触控板滑动</span><br><br>
        撞墙或对方 → 扣分并重生　抢食物 → 得分`,
     hintPvpKey:
       `<span class="c-p1">● 玩家1：WASD 移动</span><br>
