@@ -554,6 +554,51 @@ body.light #overlay { background: rgba(237,229,210,0.94); }
   letter-spacing: 2px;
 }
 
+/* ═══════════════════════════════════════════
+   Back-to-menu confirmation dialog
+═══════════════════════════════════════════ */
+#back-confirm {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(13,25,34,0.86);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  transition: background 0.25s;
+}
+
+body.light #back-confirm { background: rgba(237,229,210,0.88); }
+
+#back-confirm.visible { display: flex; }
+
+#back-confirm-box {
+  background: var(--select-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 280px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+#back-confirm-box p {
+  font-size: clamp(0.82rem, 3.5vw, 1rem);
+  color: var(--text);
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+
+#back-confirm-btns {
+  display: flex;
+  gap: 12px;
+}
+
 /* Show the hint whenever a touch device is held landscape */
 @media (pointer: coarse) and (orientation: landscape) {
   #rotate-hint { display: flex; }

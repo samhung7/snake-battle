@@ -97,6 +97,9 @@ const I18N = {
     pauseSubKey:   '按 P 繼續',
     respawning:    '重生中...',
     p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
+    backConfirmMsg: '確定要離開遊戲？',
+    backConfirmNo:  '繼續遊戲',
+    backConfirmYes: '離開',
     rotateHint: '請旋轉手機為直向',
     hintPvpTouch:
       `<span class="c-p1">● 玩家1：下方觸控板滑動</span><br>
@@ -145,6 +148,9 @@ const I18N = {
     pauseSubKey:   'P to resume',
     respawning:    'Respawning...',
     p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
+    backConfirmMsg: 'Leave the game?',
+    backConfirmNo:  'Keep Playing',
+    backConfirmYes: 'Leave',
     rotateHint: 'Please rotate to portrait',
     hintPvpTouch:
       `<span class="c-p1">● P1: Swipe on bottom pad</span><br>
@@ -193,6 +199,9 @@ const I18N = {
     pauseSubKey:   'P で再開',
     respawning:    '復活中...',
     p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
+    backConfirmMsg: 'ゲームを終了しますか？',
+    backConfirmNo:  '続ける',
+    backConfirmYes: '終了',
     rotateHint: '縦向きに回転してください',
     hintPvpTouch:
       `<span class="c-p1">● P1：下のタッチパッドをスワイプ</span><br>
@@ -241,6 +250,9 @@ const I18N = {
     pauseSubKey:   'P 재개',
     respawning:    '부활 중...',
     p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
+    backConfirmMsg: '게임을 종료할까요?',
+    backConfirmNo:  '계속하기',
+    backConfirmYes: '나가기',
     rotateHint: '세로 방향으로 회전해 주세요',
     hintPvpTouch:
       `<span class="c-p1">● P1: 아래 터치패드 스와이프</span><br>
@@ -289,6 +301,9 @@ const I18N = {
     pauseSubKey:   '按 P 继续',
     respawning:    '重生中...',
     p1: 'P1', p2: 'P2', cpu: 'AI', cpu1: 'AI 1', cpu2: 'AI 2',
+    backConfirmMsg: '确定要离开游戏？',
+    backConfirmNo:  '继续游戏',
+    backConfirmYes: '离开',
     rotateHint: '请旋转手机为竖向',
     hintPvpTouch:
       `<span class="c-p1">● 玩家1：下方触控板滑动</span><br>
@@ -480,9 +495,36 @@ function setupDpads() {
 // ─────────────────────────────────────────────
 // Navigation helpers
 // ─────────────────────────────────────────────
+/** Show the confirmation dialog before leaving the game. */
+function askBackToMenu() {
+  // Auto-pause while the dialog is open
+  if (!paused) { paused = true; document.getElementById('back-confirm')._didPause = true; }
+  else { document.getElementById('back-confirm')._didPause = false; }
+  const dlg = document.getElementById('back-confirm');
+  // Refresh button text for current language
+  dlg.querySelector('[data-i18n="backConfirmMsg"]').textContent = T('backConfirmMsg');
+  dlg.querySelector('[data-i18n="backConfirmNo"]').textContent  = T('backConfirmNo');
+  dlg.querySelector('[data-i18n="backConfirmYes"]').textContent = T('backConfirmYes');
+  dlg.classList.add('visible');
+}
+
+/** Confirmed — actually go back to menu. */
+function confirmBack() {
+  document.getElementById('back-confirm').classList.remove('visible');
+  backToMenu();
+}
+
+/** Cancelled — close dialog and resume if we auto-paused. */
+function cancelBack() {
+  const dlg = document.getElementById('back-confirm');
+  dlg.classList.remove('visible');
+  if (dlg._didPause) { paused = false; dlg._didPause = false; }
+}
+
 function backToMenu() {
   stopGame();
   document.getElementById('overlay').classList.remove('visible');
+  document.getElementById('back-confirm').classList.remove('visible');
   const gc = document.getElementById('game-container');
   gc.style.display = 'none';
   // Clean up pvp-touch layout state so next visit starts fresh
@@ -591,7 +633,14 @@ const KEY1 = { KeyW:'UP', KeyS:'DOWN', KeyA:'LEFT', KeyD:'RIGHT' };
 const KEY2 = { ArrowUp:'UP', ArrowDown:'DOWN', ArrowLeft:'LEFT', ArrowRight:'RIGHT' };
 
 document.addEventListener('keydown', e => {
-  if (e.code === 'Escape') { backToMenu(); return; }
+  if (e.code === 'Escape') {
+    const dlg = document.getElementById('back-confirm');
+    if (dlg.classList.contains('visible')) { cancelBack(); return; }
+    if (document.getElementById('game-container').style.display !== 'none') {
+      askBackToMenu(); return;
+    }
+    return;
+  }
   if (e.code === 'KeyP')   { togglePause(); return; }
   if (!snake1 || mode === 'cvc') return;
 
@@ -651,7 +700,7 @@ document.getElementById('pause-btn').addEventListener('touchstart', e => {
 // Back button — fast touch response
 document.getElementById('back-btn').addEventListener('touchstart', e => {
   e.preventDefault();
-  backToMenu();
+  askBackToMenu();
 }, { passive: false });
 
 // ─────────────────────────────────────────────
@@ -1073,7 +1122,7 @@ document.getElementById('pvp-pause-btn').addEventListener('touchstart', e => {
 document.querySelectorAll('.pvp-back-btn').forEach(btn => {
   btn.addEventListener('touchstart', e => {
     e.preventDefault();
-    backToMenu();
+    askBackToMenu();
   }, { passive: false });
 });
 

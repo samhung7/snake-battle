@@ -139,7 +139,7 @@
     <div class="pvp-bar-btns">
       <button class="icon-btn" onclick="toggleTheme()"><span class="theme-icon">🌙</span></button>
       <button class="icon-btn" id="pvp-pause-btn" onclick="togglePause()">⏸</button>
-      <button class="icon-btn pvp-back-btn" onclick="backToMenu()">⌂</button>
+      <button class="icon-btn pvp-back-btn" onclick="askBackToMenu()">⌂</button>
     </div>
   </div>
 
@@ -154,7 +154,7 @@
         <span class="theme-icon">🌙</span>
       </button>
       <button class="icon-btn" id="pause-btn" onclick="togglePause()" title="暫停">⏸</button>
-      <button class="icon-btn" id="back-btn"  onclick="backToMenu()"  title="回主選單">⌂</button>
+      <button class="icon-btn" id="back-btn"  onclick="askBackToMenu()"  title="回主選單">⌂</button>
     </div>
   </div>
 
@@ -194,6 +194,17 @@
   <p  id="overlay-msg"></p>
   <button class="btn btn-1" id="restart-btn" onclick="restartGame()" data-i18n="restartBtn">再玩一局</button>
   <button class="btn btn-2" id="menu-btn"    onclick="backToMenu()"  data-i18n="menuBtn">主選單</button>
+</div>
+
+<!-- Back-to-menu confirmation dialog -->
+<div id="back-confirm">
+  <div id="back-confirm-box">
+    <p data-i18n="backConfirmMsg">確定要離開遊戲？</p>
+    <div id="back-confirm-btns">
+      <button class="btn btn-2" onclick="cancelBack()" data-i18n="backConfirmNo">繼續遊戲</button>
+      <button class="btn btn-3" onclick="confirmBack()" data-i18n="backConfirmYes">離開</button>
+    </div>
+  </div>
 </div>
 
 <!-- Portrait-lock hint overlay — shown via CSS when phone is landscape -->
